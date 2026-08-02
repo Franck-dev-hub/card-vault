@@ -13,6 +13,7 @@ apps/api/var
 apps/ml/.venv
 apps/ml/models
 apps/ml/data_cache
+apps/ml/app/models/data_cache
 apps/ml/.cache
 test-results
 playwright-report

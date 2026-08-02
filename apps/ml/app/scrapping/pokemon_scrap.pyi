@@ -1,0 +1,6 @@
+from typing import Any, Tuple
+from pathlib import Path
+
+def fetch_all_cards() -> list[dict[str, Any]]: ...
+
+def download_card(card: dict[str, Any], output_dir: Path) -> Tuple[bool, str | None]: ...

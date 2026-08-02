@@ -20,6 +20,7 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+apps/ml/app/models/data_cache/
 
 # PHP / Symfony
 apps/api/vendor/

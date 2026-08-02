@@ -93,10 +93,9 @@ git clone https://github.com/Franck-dev-hub/card_vault.git
 cd card_vault
 ```
 
-Copy the environment file and fill in your own values (secrets, DB credentials, `HF_TOKEN`, ...)
+Generate the gitignored local environment overrides (secrets, DB credentials, `HF_TOKEN`, ...)
 ```bash
 make env
-# or: cp .env.example .env
 ```
 
 Display `make` help

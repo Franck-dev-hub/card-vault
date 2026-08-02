@@ -60,12 +60,24 @@ jobs:
             # Log in to GHCR
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+            # Fail fast if prod secrets are still placeholders
+            if [ ! -f .env.prod.local ]; then
+              echo "ERROR: .env.prod.local is missing. Create it on the host (see 'make env/prod')."
+              exit 1
+            fi
+            for key in APP_SECRET POSTGRES_PASSWORD; do
+              if grep -q "^${key}=change-me$" .env.prod.local; then
+                echo "ERROR: ${key} is still a placeholder in .env.prod.local."
+                exit 1
+              fi
+            done
+
             # Pull and start the production stack (migrations run on boot via the migrate service)
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod pull
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod up -d
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local pull
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local up -d
 
             # Verify services are running
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod ps
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local ps
 
             # Clean up dangling images only, never other projects' containers
             docker image prune -f

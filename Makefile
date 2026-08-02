@@ -1,10 +1,11 @@
 .DEFAULT_GOAL := help
 
 # Variables
-DC_DEV = docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --env-file .env
-DC_PROD = docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod
-DC_PREPROD = docker compose -f docker/compose.yaml -f docker/compose.preprod.yaml --env-file .env.preprod
-DC_CI = docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env
+# Base .env first, then per-env overrides, gitignored local secrets last
+DC_DEV = docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --env-file .env --env-file .env.local
+DC_PROD = docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local
+DC_PREPROD = docker compose -f docker/compose.yaml -f docker/compose.preprod.yaml --env-file .env --env-file .env.preprod --env-file .env.preprod.local
+DC_CI = docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local
 
 # Environments and which ones pull GHCR images before starting
 ENVS := dev preprod prod
@@ -21,32 +22,64 @@ prod_DC = $(DC_PROD)
 
 # === ENV ===
 
-# Copy env templates into place (dev + prod + preprod)
+# Generate gitignored local overrides. The tracked placeholders (.env, .env.prod,
+# .env.preprod) are committed as-is and never carry real secrets.
 env:
-	@test -f .env || cp .env.example .env
-	@test -f .env.prod || sed 's/^PROJECT_ENV=.*/PROJECT_ENV=prod/' .env.example > .env.prod
-	@test -f .env.preprod || sed 's/^PROJECT_ENV=.*/PROJECT_ENV=preprod/' .env.example > .env.preprod
-	@echo "Env files ready (.env, .env.prod, .env.preprod). Fill in secrets."
+	@test -f .env.local || { \
+		cp .env .env.local; \
+		secret=$$(openssl rand -hex 32); \
+		password=$$(openssl rand -hex 16); \
+		sed -i "s/^APP_SECRET=.*/APP_SECRET=$$secret/; s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$$password/; s/^PGADMIN_PASSWORD=.*/PGADMIN_PASSWORD=$$password/" .env.local; \
+	}
+	@echo ".env.local ready (dev, full copy with generated secrets)."
 
 env/prod:
-	@test -f .env.prod || sed 's/^PROJECT_ENV=.*/PROJECT_ENV=prod/' .env.example > .env.prod
-	@echo ".env.prod created"
+	@test -f .env.prod.local || { \
+		{ \
+			echo "# Prod secrets, gitignored, override .env.prod"; \
+			echo "APP_SECRET=$$(openssl rand -hex 32)"; \
+			echo "POSTGRES_PASSWORD=$$(openssl rand -hex 16)"; \
+			echo "PGADMIN_PASSWORD=$$(openssl rand -hex 16)"; \
+			echo "HF_TOKEN="; \
+		} > .env.prod.local; \
+	}
+	@echo ".env.prod.local ready (secret overrides only)."
 
 env/preprod:
-	@test -f .env.preprod || sed 's/^PROJECT_ENV=.*/PROJECT_ENV=preprod/' .env.example > .env.preprod
-	@echo ".env.preprod created"
+	@test -f .env.preprod.local || { \
+		{ \
+			echo "# Preprod secrets, gitignored, override .env.preprod"; \
+			echo "APP_SECRET=$$(openssl rand -hex 32)"; \
+			echo "POSTGRES_PASSWORD=$$(openssl rand -hex 16)"; \
+			echo "PGADMIN_PASSWORD=$$(openssl rand -hex 16)"; \
+			echo "HF_TOKEN="; \
+		} > .env.preprod.local; \
+	}
+	@echo ".env.preprod.local ready (secret overrides only)."
+
+# Abort when a non-dev environment still uses placeholder secrets
+define check-secrets
+	@for key in APP_SECRET POSTGRES_PASSWORD; do \
+		if grep -q "^$$key=change-me$$" ".env.$(1).local" 2>/dev/null; then \
+			echo "ERROR: $$key is still a placeholder in .env.$(1).local. Run 'make env/$(1)' or fill in real values."; \
+			exit 1; \
+		fi; \
+	done
+endef
 
 # === ENVIRONMENTS ===
 
 # UP: Start an environment (preprod/prod pull GHCR images first)
 %/up:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
+	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up -d
 
 # BUILD ALL: Build and start (dev builds locally, preprod/prod pull + start)
 %/build:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
+	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up --build -d
 
@@ -61,6 +94,7 @@ $(eval .PHONY: $(ENVS:%=%/build/%))
 # PULL: Pull GHCR images for an environment
 %/pull:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
+	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$($*_DC) pull
 
 # === LINTING ===
@@ -141,7 +175,7 @@ help:
 	@echo " Environments : dev, preprod, prod "
 	@echo ""
 	@echo "----- ENVIRONMENTS -----------------------"
-	@echo "  env                   -> Create env files"
+	@echo "  env                   -> Generate gitignored local env overrides"
 	@echo "  {env}/up              -> Start an environment"
 	@echo "  {env}/build           -> Build + start"
 	@echo "  {env}/build/{service} -> Rebuild/restart one service"

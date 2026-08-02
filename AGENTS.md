@@ -132,7 +132,7 @@ row per addition.
 Run from the repository root. `make` alone prints help.
 
 ```bash
-make env                      # create .env, .env.prod, .env.preprod from templates
+make env                      # generate gitignored .env.local (dev secrets)
 make dev/up                   # start dev stack
 make dev/build                # build + start dev stack
 make dev/build/{service}      # rebuild one service (api, frontend, ml, ...)

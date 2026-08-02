@@ -15,12 +15,11 @@ cd card_vault
 
 ## Environment
 
-Copy the environment template and fill in your own values (secrets, database
-credentials, `HF_TOKEN`, ...).
+Generate the gitignored local environment overrides (secrets, database
+credentials, `HF_TOKEN`, ...). Fill in `HF_TOKEN` by hand afterwards.
 
 ```bash
 make env
-# or: cp .env.example .env
 ```
 
 See [Configuration](configuration.md) for the full variable list.

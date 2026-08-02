@@ -1,14 +1,25 @@
 # Configuration
 
-All configuration goes through environment files. Copy the template with
-`make env` (creates `.env`, `.env.prod`, `.env.preprod`) or manually:
+All configuration goes through environment files, layered per environment.
+`.env` is the committed base placeholder; `.env.prod` and `.env.preprod` are
+committed overrides that set the environment-specific values on top of it.
+Run `make env` to generate the gitignored local overrides that hold the real
+secrets:
 
 ```bash
-cp .env.example .env
+make env            # .env.local (dev, full copy with generated secrets)
+make env/prod       # .env.prod.local (secret overrides only)
+make env/preprod    # .env.preprod.local (secret overrides only)
 ```
 
-`.env` drives the dev stack, `.env.preprod` and `.env.prod` drive their
-respective environments. Secrets are never committed.
+Each compose invocation reads the chain `.env` → per-env override →
+local overrides, with later files winning:
+
+- dev: `.env` + `.env.local`
+- prod: `.env` + `.env.prod` + `.env.prod.local`
+- preprod: `.env` + `.env.preprod` + `.env.preprod.local`
+
+Real secrets are never committed.
 
 ## Variables
 
@@ -39,6 +50,8 @@ respective environments. Secrets are never committed.
 
 ## Secrets
 
-- Never commit `.env`, `.env.prod`, `.env.preprod`, or any token.
+- Never commit a local override (`.env.local`, `.env.prod.local`,
+  `.env.preprod.local`) or any token.
 - Rotate any value that leaks (tokens, passwords).
-- Production secrets live only on the deploy host and in the CI secrets store.
+- Production secrets live only on the deploy host (`.env.prod.local`) and in
+  the CI secrets store.

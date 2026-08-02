@@ -4,8 +4,13 @@
 
 # Environment
 .env
-.env.prod
-.env.preprod
+.env.dev
+.env.test
+!/.env
+!/.env.prod
+!/.env.preprod
+.env.local
+.env.*.local
 
 # Node
 node_modules/

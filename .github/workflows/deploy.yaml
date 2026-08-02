@@ -1,0 +1,100 @@
+name: Deployment
+
+on:
+  workflow_run:
+    workflows:
+      - "Build and Push to GHCR"
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  deployments: write
+
+jobs:
+  deployment:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'prod' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency: prod
+
+    steps:
+      - name: Create GitHub Deployment (Pending)
+        uses: actions/github-script@v7
+        id: deployment
+        with:
+          script: |
+            const ref = context.payload.workflow_run ? context.payload.workflow_run.head_sha : context.sha;
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: ref,
+              environment: 'production',
+              auto_merge: false,
+              required_contexts: [],
+              description: `Deploying from ${ref}`,
+              transient_environment: false
+            });
+            core.setOutput('deployment_id', deployment.data.id);
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Deploy via SSH (Pull from GHCR)
+        id: deploy-ssh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
+            cd ~/Server/card_vault
+            git remote set-url origin https://github.com/${{ github.repository }}.git
+            git pull origin prod
+
+            # Log in to GHCR
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull and start the production stack (migrations run on boot via the migrate service)
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod pull
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod up -d
+
+            # Verify services are running
+            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env.prod ps
+
+            # Clean up dangling images only, never other projects' containers
+            docker image prune -f
+
+      - name: Update Deployment Status (Success)
+        if: success() && steps.deploy-ssh.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.deployment.outputs.deployment_id }},
+              state: 'success',
+              environment: 'production',
+              environment_url: 'https://card-vault.fr',
+              description: 'Successfully deployed from GHCR'
+            });
+
+      - name: Update Deployment Status (Failure)
+        if: failure() || steps.deploy-ssh.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.deployment.outputs.deployment_id }},
+              state: 'failure',
+              environment: 'production',
+              description: 'Deployment failed. Check logs.'
+            });

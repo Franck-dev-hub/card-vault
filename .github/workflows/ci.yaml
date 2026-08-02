@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: make env
+
+      # GH runner uid 1001 vs image user uid 1000: align mount ownership
+      - name: Align source permissions with the container user
+        run: sudo chown -R 1000:1000 apps
+
+      - name: Build CI image
+        if: hashFiles('apps/api/composer.json') != ''
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml build php
+
+      - name: Lint
+        if: hashFiles('apps/api/composer.json') != ''
+        run: make lint/backend
+
+      - name: Security audit
+        if: hashFiles('apps/api/composer.json') != ''
+        run: make sec/backend
+
+      - name: Tests
+        if: hashFiles('apps/api/composer.json') != ''
+        run: make test/backend
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: make env
+
+      # GH runner uid 1001 vs image user uid 1000: align mount ownership
+      - name: Align source permissions with the container user
+        run: sudo chown -R 1000:1000 apps
+
+      - name: Lint
+        if: hashFiles('apps/frontend/package.json') != ''
+        run: make lint/frontend
+
+      - name: Security audit
+        if: hashFiles('apps/frontend/package.json') != ''
+        run: make sec/frontend
+
+      - name: Tests
+        if: hashFiles('apps/frontend/package.json') != ''
+        run: make test/frontend
+
+  ml:
+    name: Machine learning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: make env
+
+      - name: Lint
+        if: hashFiles('apps/ml/requirements.txt') != ''
+        run: make lint/ml
+
+      - name: Security audit
+        if: hashFiles('apps/ml/requirements.txt') != ''
+        run: make sec/ml
+
+      - name: Tests
+        if: hashFiles('apps/ml/requirements.txt') != ''
+        run: make test/ml
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'prod'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: make env
+
+      # GH runner uid 1001 vs image user uid 1000: align mount ownership
+      - name: Align source permissions with the container user
+        run: sudo chown -R 1000:1000 apps
+
+      - name: Build Playwright image
+        if: hashFiles('apps/frontend/package.json') != ''
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --profile e2e build playwright
+
+      - name: Run E2E
+        if: hashFiles('apps/frontend/package.json') != ''
+        run: make test/e2e

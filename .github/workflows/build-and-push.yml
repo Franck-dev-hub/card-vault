@@ -1,0 +1,89 @@
+name: Build and Push to GHCR
+
+on:
+  push:
+    branches:
+      - prod
+      - preprod
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - prod
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ${{ vars.DOCKER_REGISTRY || 'ghcr.io/franck-dev-hub' }}
+  ENV: ${{ github.ref == 'refs/heads/preprod' && 'preprod' || 'prod' }}
+
+jobs:
+  build-and-push:
+    name: Build and push ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            file: docker/Dockerfile
+            target: frankenphp_release
+            args: |
+              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '22' }}
+              PHP_VERSION=${{ vars.PHP_VERSION || '8.4' }}
+              FRANKENPHP_VERSION=${{ vars.FRANKENPHP_VERSION || '1.12.6' }}
+              COMPOSER_VERSION=${{ vars.COMPOSER_VERSION || '2.9' }}
+              PHP_EXTENSIONS=${{ vars.PHP_EXTENSIONS || 'intl opcache apcu pdo_pgsql redis sodium' }}
+              SESSION_LIFETIME=${{ vars.SESSION_LIFETIME || '604800' }}
+              USER=${{ vars.PROJECT_NAME || 'cardvault' }}
+              USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}
+              GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}
+              RELEASE_APP_CONFIG_ENV=prod
+              RELEASE_VERSION=${{ github.ref_name }}
+          - name: frontend
+            file: docker/frontend/Dockerfile
+            target: ""
+            args: |
+              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '22' }}
+          - name: ml
+            file: docker/ml/Dockerfile
+            target: ""
+            args: |
+              PYTHON_VERSION=${{ vars.PYTHON_VERSION || '3.12' }}
+              USER=${{ vars.PROJECT_NAME || 'cardvault' }}
+              USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}
+              GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ matrix.name }}/${{ env.ENV }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+            type=ref,event=tag
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          target: ${{ matrix.target }}
+          build-args: ${{ matrix.args }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ github.event_name != 'pull_request' }}

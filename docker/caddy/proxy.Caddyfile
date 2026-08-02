@@ -1,0 +1,24 @@
+# Front proxy (Caddy) - production entry point
+# Routes /api/* to the FrankenPHP API, /ml/* to the ML service, everything else to the Angular frontend.
+{$CADDY_DOMAIN_NAME:localhost} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle /ml/* {
+		reverse_proxy ml:5000
+	}
+
+	handle {
+		reverse_proxy frontend:80
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy no-referrer
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+}

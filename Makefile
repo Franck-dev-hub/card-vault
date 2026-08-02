@@ -106,7 +106,7 @@ lint/backend:
 	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && vendor/bin/phpstan analyse && vendor/bin/php-cs-fixer fix --dry-run --diff"
 
 lint/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "pip install -q ruff mypy && ruff check . && mypy ."
+	$(DC_DEV) run --rm --no-deps ml sh -c "uv run ruff check . && uv run mypy ."
 
 lint: lint/frontend lint/backend lint/ml
 
@@ -119,7 +119,7 @@ sec/backend:
 	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && composer audit"
 
 sec/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "pip install -q pip-audit && pip-audit"
+	$(DC_DEV) run --rm --no-deps ml sh -c "uv run --with pip-audit pip-audit"
 
 sec: sec/frontend sec/backend sec/ml
 
@@ -133,7 +133,7 @@ test/frontend:
 	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm test"
 
 test/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "pip install -q pytest && pytest"
+	$(DC_DEV) run --rm --no-deps ml sh -c "uv run --with pytest pytest"
 
 test/e2e:
 	$(DC_DEV) up -d

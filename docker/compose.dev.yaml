@@ -52,9 +52,10 @@ services:
     build: !reset
     working_dir: /app
     user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
-    command: ["sh", "-c", "corepack pnpm install && corepack pnpm start"]
+    command: ["sh", "-c", "corepack pnpm install && corepack pnpm exec ng serve --host 0.0.0.0"]
     environment:
       CHOKIDAR_USEPOLLING: "true"
+      CI: "true"
     volumes:
       - ../apps/frontend:/app
     healthcheck:
@@ -68,17 +69,18 @@ services:
         condition: service_healthy
 
   ml:
-    image: python:${PYTHON_VERSION:?error}-slim
-    build: !reset
     working_dir: /app
-    command: ["sh", "-c", "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload"]
+    user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
+      UV_CACHE_DIR: /tmp/.uv-cache
     volumes:
       - ../apps/ml:/app
+      - ml_hf_cache:/tmp/hf
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/ml/health')"]
-      start_period: 180s
+      start_period: 600s
       interval: 10s
       timeout: 5s
       retries: 5
@@ -132,3 +134,4 @@ volumes:
   caddy_data:
   caddy_config:
   redisinsight_data:
+  ml_hf_cache:

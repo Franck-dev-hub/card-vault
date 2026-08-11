@@ -1,5 +1,5 @@
-# Front proxy (Caddy) - development entry point (HTTP only, no TLS)
-# Routes /api/* to the FrankenPHP API, /ml/* to the ML service, everything else to the Angular dev server.
+# Front proxy (Caddy) - preproduction entry point (HTTP only)
+# Routes /api/* to the FrankenPHP API, /ml/* to the ML service, everything else to the Angular frontend.
 http://{$CADDY_DOMAIN_NAME} {
 	encode zstd gzip
 
@@ -12,7 +12,7 @@ http://{$CADDY_DOMAIN_NAME} {
 	}
 
 	handle {
-		reverse_proxy frontend:4200
+		reverse_proxy frontend:80
 	}
 
 	header {

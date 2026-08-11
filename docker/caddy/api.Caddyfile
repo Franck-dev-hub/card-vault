@@ -2,7 +2,6 @@
 # The front proxy (Caddy) routes /api/* here and terminates TLS.
 {
 	admin 127.0.0.1:2019
-	global_logs off
 }
 
 :8000 {

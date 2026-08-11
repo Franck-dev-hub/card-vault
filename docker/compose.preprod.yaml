@@ -4,8 +4,9 @@ name: ${PROJECT_NAME:?error}
 services:
   caddy:
     ports:
-      - "8080:80"
-      - "8443:443"
+      - "80:80"
+    volumes:
+      - ./caddy/proxy.preprod.Caddyfile:/etc/caddy/Caddyfile:ro
 
   api:
     build: !reset

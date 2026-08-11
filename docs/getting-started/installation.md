@@ -9,8 +9,8 @@
 ## Clone
 
 ```bash
-git clone https://github.com/Franck-dev-hub/card_vault.git
-cd card_vault
+git clone https://github.com/Franck-dev-hub/card-vault.git
+cd card-vault
 ```
 
 ## Environment
@@ -36,10 +36,10 @@ make dev/up     # start the stack after a build
 
 | Service      | URL                       |
 |--------------|---------------------------|
-| Frontend     | http://localhost          |
-| Backend API  | http://localhost/api      |
-| API docs     | http://localhost/api/docs |
-| ML service   | http://localhost/ml       |
+| Frontend     | http://card-vault.localhost          |
+| Backend API  | http://card-vault.localhost/api      |
+| API docs     | http://card-vault.localhost/api/docs |
+| ML service   | http://card-vault.localhost/ml       |
 | pgAdmin      | http://localhost:5050     |
 | RedisInsight | http://localhost:5540     |
 | Mailpit      | http://localhost:8025     |
@@ -49,7 +49,7 @@ make dev/up     # start the stack after a build
 ```bash
 make lint           # lint all stacks
 make test/backend   # PHPUnit
-make test/frontend  # Jest (needs apps/frontend deps)
+make test/frontend  # Vitest (needs apps/frontend deps)
 make test/ml        # pytest
 make test/e2e       # Playwright
 make ci             # lint + security + all tests

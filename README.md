@@ -10,14 +10,14 @@ The platform offers advanced filtering, cross-game organization, and an integrat
 <div align="center">
 
 [![Website](https://img.shields.io/website?url=https://card-vault.fr&label=card-vault.fr)](http://card-vault.fr)
-[![GitHub License](https://img.shields.io/github/license/Franck-dev-hub/card_vault?label=License)](https://github.com/Franck-dev-hub/card_vault/blob/prod/LICENSE)
+[![GitHub License](https://img.shields.io/github/license/Franck-dev-hub/card-vault?label=License)](https://github.com/Franck-dev-hub/card-vault/blob/prod/LICENSE)
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Us-FF5E5B?&logo=ko-fi&logoColor=white)](https://ko-fi.com/cardvault)
-[![GitHub Issues](https://img.shields.io/github/issues/Franck-dev-hub/card_vault?&logo=github?&label=Issues)](https://github.com/Franck-dev-hub/card_vault/issues)
+[![GitHub Issues](https://img.shields.io/github/issues/Franck-dev-hub/card-vault?&logo=github?&label=Issues)](https://github.com/Franck-dev-hub/card-vault/issues)
 
 
-![Github CI](https://github.com/Franck-dev-hub/card_vault/actions/workflows/ci.yaml/badge.svg)
-![Release](https://img.shields.io/github/v/release/Franck-dev-hub/card_vault?label=Last%20release)
-![Version](https://img.shields.io/github/v/tag/Franck-dev-hub/card_vault?label=Last%20tag&color=blue)
+![Github CI](https://github.com/Franck-dev-hub/card-vault/actions/workflows/ci.yaml/badge.svg)
+![Release](https://img.shields.io/github/v/release/Franck-dev-hub/card-vault?label=Last%20release)
+![Version](https://img.shields.io/github/v/tag/Franck-dev-hub/card-vault?label=Last%20tag&color=blue)
 
 ![Pokémon](https://img.shields.io/badge/TCG-Pokémon-FFCB05)
 ![Magic](https://img.shields.io/badge/TCG-Magic%20the%20gathering-D02E20)
@@ -74,7 +74,7 @@ The platform offers advanced filtering, cross-game organization, and an integrat
 | Part             | Language / framework                                                                                                                                                                   | Tools                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Tests                                                                                                                                                                                                                                   |
 |------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Backend          | ![Symfony](https://img.shields.io/badge/PHP-Symfony-black?logo=symfony&logoColor=fff&labelColor=777BB3)                                                                                | ![API Platform](https://img.shields.io/badge/API_Platform-6366F1?logo=api-platform&logoColor=white) ![Doctrine](https://img.shields.io/badge/Doctrine-4479A1?logo=doctrine&logoColor=white) ![EasyAdmin](https://img.shields.io/badge/EasyAdmin-1B2A4A?logo=symfony&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                       | ![PHPStan](https://img.shields.io/badge/PHPStan-93C748?logo=php&logoColor=white) ![PHPUnit](https://img.shields.io/badge/PHPUnit-3A4A5C?logo=php&logoColor=white) ![PHP CS Fixer](https://img.shields.io/badge/PHP%20CS%20Fixer-0066C8) |
-| Frontend         | ![Angular](https://img.shields.io/badge/Typescript-Angular-DD0031?logo=angular&logoColor=fff&labelColor=3178C6)                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | ![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white) ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)                                                               |
+| Frontend         | ![Angular](https://img.shields.io/badge/Typescript-Angular-DD0031?logo=angular&logoColor=fff&labelColor=3178C6)                                                                        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white) ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)                                                               |
 | Machine learning | ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)                                                                                                        | ![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white) ![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000) ![FAISS](https://img.shields.io/badge/FAISS-4285F4?logo=meta&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                                      |                                                                                                                                                                                                                                         |
 | Database         | ![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white) | ![pgAdmin](https://img.shields.io/badge/pgAdmin-316192?logo=postgresql&logoColor=white) ![RedisInsight](https://img.shields.io/badge/RedisInsight-DC382D?logo=redis&logoColor=white) ![Mailpit](https://img.shields.io/badge/Mailpit-3399FF?logo=minutemailer&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                         |
 | DevOps           |                                                                                                                                                                                        | ![Docker Compose](https://img.shields.io/badge/Docker-Compose-gray?logo=docker&logoColor=fff&labelColor=2496ED) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) ![Caddy](https://img.shields.io/badge/Caddy-1F8AC8?logo=caddy&logoColor=white) ![Sentry](https://img.shields.io/badge/Sentry-362D59?logo=sentry&logoColor=white) ![Matomo](https://img.shields.io/badge/Matomo-3152A0?logo=matomo&logoColor=white) ![Tarteaucitron](https://img.shields.io/badge/Tarteaucitron-F7D917?logo=tarteaucitron&logoColor=black) ![FrankenPHP](https://img.shields.io/badge/FrankenPHP-b3d133?logo=php&logoColor=black) |                                                                                                                                                                                                                                         |
@@ -89,8 +89,8 @@ The platform offers advanced filtering, cross-game organization, and an integrat
 ## Installation and run
 Clone the repo
 ```bash
-git clone https://github.com/Franck-dev-hub/card_vault.git
-cd card_vault
+git clone https://github.com/Franck-dev-hub/card-vault.git
+cd card-vault
 ```
 
 Generate the gitignored local environment overrides (secrets, DB credentials, `HF_TOKEN`, ...)
@@ -117,10 +117,10 @@ Once running, the app is available at:
 
 | Service      | URL                       |
 |--------------|---------------------------|
-| Frontend     | http://localhost          |
-| Backend API  | http://localhost/api      |
-| API docs     | http://localhost/api/docs |
-| ML service   | http://localhost/ml       |
+| Frontend     | http://card-vault.localhost          |
+| Backend API  | http://card-vault.localhost/api      |
+| API docs     | http://card-vault.localhost/api/docs |
+| ML service   | http://card-vault.localhost/ml       |
 | pgAdmin      | http://localhost:5050     |
 | RedisInsight | http://localhost:5540     |
 
@@ -139,7 +139,7 @@ Backend tests (PHPUnit)
 make test/backend
 ```
 
-Frontend tests (Jest)
+Frontend tests (Vitest)
 ```bash
 make test/frontend
 ```
@@ -160,7 +160,7 @@ See [Testing and linting](docs/getting-started/installation.md) in the docs for 
 
 ## Contributing and security
 Please read our [![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue?logo=git&logoColor=white)](docs/contributing/guidelines.md)
-Bug reports and feature requests are welcome via [![GitHub issues](https://img.shields.io/badge/GitHub%20issues-121013?logo=github&logoColor=white)](https://github.com/Franck-dev-hub/card_vault/issues)
+Bug reports and feature requests are welcome via [![GitHub issues](https://img.shields.io/badge/GitHub%20issues-121013?logo=github&logoColor=white)](https://github.com/Franck-dev-hub/card-vault/issues)
 Found a security issue ? Please follow our [![Security Policy](https://img.shields.io/badge/Security-Policy-informational?logo=awesomelists&logoColor=white)](SECURITY.md) instead of opening a public issue.
 
 ---

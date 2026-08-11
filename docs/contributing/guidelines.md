@@ -27,7 +27,7 @@
   a short clause explaining why, never a narration.
 - No `var_dump()`, `dd()`, `dump()`.
 - PHP: Yoda conditions (`null === $x`), PHPStan at max level, PHP CS Fixer.
-- TypeScript: ESLint + strict TypeScript, Jest, Playwright.
+- TypeScript: ESLint + strict TypeScript, Vitest, Playwright.
 - Python: ruff + mypy, pytest.
 - Backend: no business logic in controllers, interfaces for every external
   integration, repository pattern, API Platform DTOs.

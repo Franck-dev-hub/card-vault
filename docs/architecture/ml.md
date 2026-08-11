@@ -3,7 +3,7 @@
 ## Stack
 
 Python 3.12, FastAPI, PyTorch, Hugging Face Transformers (DINOv2), FAISS.
-Dependencies managed with pip in the image build.
+Dependencies managed with uv (`pyproject.toml` + `uv.lock`) in the image build.
 
 ## Role
 

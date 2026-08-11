@@ -46,7 +46,6 @@ Real secrets are never committed.
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | Database credentials                                         |
 | `PGADMIN_PASSWORD`                                    | pgAdmin password (dev)                                       |
 | `HF_TOKEN`                                            | Hugging Face token, required to download models on first run |
-| `PLAYWRIGHT_VERSION`                                  | Playwright version used by e2e tests                         |
 
 ## Secrets
 

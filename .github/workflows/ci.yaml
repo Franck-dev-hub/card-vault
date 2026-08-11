@@ -71,6 +71,9 @@ jobs:
       - name: Prepare environment
         run: make env
 
+      - name: Align source permissions with the container user
+        run: sudo chown -R 1000:1000 apps
+
       - name: Lint
         if: hashFiles('apps/ml/pyproject.toml') != ''
         run: make lint/ml

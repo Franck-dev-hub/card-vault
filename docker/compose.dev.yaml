@@ -41,7 +41,7 @@ services:
         client_host=host.docker.internal
         client_port=9003
       PHP_IDE_CONFIG: serverName=${PROJECT_NAME:?error}
-    volumes: !reset
+    volumes:
       - ../apps:/home/${PROJECT_NAME:?error}/sources
       - ./caddy/api.Caddyfile:/etc/frankenphp/Caddyfile:ro
     extra_hosts:

@@ -3,3 +3,9 @@ allowBuilds:
   '@parcel/watcher': true
   lmdb: true
   msgpackr-extract: true
+
+overrides:
+  '@hono/node-server': '>=2.0.5'
+  hono: '>=4.12.34'
+  undici: '>=7.29.0'
+  nanoid: '>=3.3.17'

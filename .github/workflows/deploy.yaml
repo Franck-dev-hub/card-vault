@@ -53,7 +53,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
-            cd ~/Server/card_vault
+            cd ~/Server/card-vault
             git remote set-url origin https://github.com/${{ github.repository }}.git
             git pull origin prod
 

@@ -34,15 +34,15 @@ make dev/up     # start the stack after a build
 
 ## URLs
 
-| Service      | URL                       |
-|--------------|---------------------------|
+| Service      | URL                                  |
+|--------------|--------------------------------------|
 | Frontend     | http://card-vault.localhost          |
 | Backend API  | http://card-vault.localhost/api      |
 | API docs     | http://card-vault.localhost/api/docs |
 | ML service   | http://card-vault.localhost/ml       |
-| pgAdmin      | http://localhost:5050     |
-| RedisInsight | http://localhost:5540     |
-| Mailpit      | http://localhost:8025     |
+| pgAdmin      | http://localhost:5050                |
+| RedisInsight | http://localhost:5540                |
+| Mailpit      | http://localhost:8025                |
 
 ## Tests and lint
 
@@ -62,10 +62,19 @@ make migrate        # apply pending migrations
 make migrate-diff   # generate a migration from entity changes
 ```
 
-## Environments
+## Dev environment
 
 ```bash
 make dev/up         # dev stack (hot reload, mailpit, pgadmin, redisinsight)
-make preprod/up     # preprod, pulls GHCR images
-make prod/up        # prod, pulls GHCR images
 ```
+
+Preprod and prod environments are managed by the maintainer and are not
+covered here.
+
+## Next steps
+
+- Work through [troubleshooting](troubleshooting.md) if something fails.
+- Read the [architecture overview](../architecture/overview.md) before touching
+  code.
+- Read the [contributing guidelines](../contributing/guidelines.md) before your
+  first commit.

@@ -115,14 +115,14 @@ make dev/up
 
 Once running, the app is available at:
 
-| Service      | URL                       |
-|--------------|---------------------------|
+| Service      | URL                                  |
+|--------------|--------------------------------------|
 | Frontend     | http://card-vault.localhost          |
 | Backend API  | http://card-vault.localhost/api      |
 | API docs     | http://card-vault.localhost/api/docs |
 | ML service   | http://card-vault.localhost/ml       |
-| pgAdmin      | http://localhost:5050     |
-| RedisInsight | http://localhost:5540     |
+| pgAdmin      | http://localhost:5050                |
+| RedisInsight | http://localhost:5540                |
 
 The dev stack exposes mailpit (mail sink) on `http://localhost:8025`.
 

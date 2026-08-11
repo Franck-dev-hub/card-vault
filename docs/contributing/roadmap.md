@@ -131,8 +131,9 @@ N/A
 
 ### V1.10: Auth update
 
-- Google connection and synchronisation
+- Verify email address on registration
 - Recover a forgotten password
+- Google connection and synchronisation
 - TOTP connection
 
 ### V1.11: Friends update

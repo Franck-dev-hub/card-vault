@@ -23,15 +23,12 @@ The FrankenPHP Caddyfile handles CORS for the API: OPTIONS preflight returns
 (`Content-Type, Authorization, X-Requested-With`). Origin comes from
 `CADDY_CORS_ORIGIN`.
 
-## TLS
-
-Let's Encrypt is handled automatically by Caddy in production through the
-`caddy_data` and `caddy_config` volumes.
-
-## Deployment (Docker)
+## Dev overlay
 
 - `docker/compose.yaml`: base stack (caddy, api, frontend, ml, database, redis)
   with healthchecks and `restart: unless-stopped`.
-- `docker/compose.dev.yaml`, `compose.preprod.yaml`, `compose.prod.yaml`,
-  `compose.ci.yaml`: environment overlays.
-- `make dev/up`, `make preprod/up`, `make prod/up` start an environment.
+- `docker/compose.dev.yaml`: dev overlay (hot reload, mailpit, pgadmin,
+  redisinsight).
+- `make dev/up` starts the dev environment.
+
+TLS and the preprod/prod overlays are managed by the maintainer.

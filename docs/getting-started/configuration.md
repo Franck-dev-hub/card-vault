@@ -1,36 +1,29 @@
 # Configuration
 
 All configuration goes through environment files, layered per environment.
-`.env` is the committed base placeholder; `.env.prod` and `.env.preprod` are
-committed overrides that set the environment-specific values on top of it.
-Run `make env` to generate the gitignored local overrides that hold the real
-secrets:
+`.env` is the committed base placeholder; run `make env` to generate the
+gitignored local overrides that hold the real secrets:
 
 ```bash
 make env            # .env.local (dev, full copy with generated secrets)
-make env/prod       # .env.prod.local (secret overrides only)
-make env/preprod    # .env.preprod.local (secret overrides only)
 ```
 
 Each compose invocation reads the chain `.env` → per-env override →
 local overrides, with later files winning:
 
 - dev: `.env` + `.env.local`
-- prod: `.env` + `.env.prod` + `.env.prod.local`
-- preprod: `.env` + `.env.preprod` + `.env.preprod.local`
 
-Real secrets are never committed.
+Real secrets are never committed. The preprod and prod environments and their
+secret overrides are managed by the maintainer.
 
 ## Variables
 
 | Variable                                              | Description                                                  |
 |-------------------------------------------------------|--------------------------------------------------------------|
 | `PROJECT_NAME`                                        | Compose project name                                         |
-| `PROJECT_ENV`                                         | Environment: `dev`, `preprod`, `prod`                        |
-| `PROJECT_DOMAIN`                                      | Public domain (e.g. `card-vault.fr`)                         |
+| `PROJECT_ENV`                                         | Environment, `dev` for local work                            |
+| `PROJECT_DOMAIN`                                      | Local domain (e.g. `card-vault.localhost`)                   |
 | `PROJECT_USER_ID` / `PROJECT_GROUP_ID`                | Host user/group for volume permissions                       |
-| `PROJECT_IMAGE_TAG`                                   | Image tag pulled for preprod/prod                            |
-| `DOCKER_REGISTRY`                                     | Registry (e.g. `ghcr.io/franck-dev-hub`)                     |
 | `PHP_VERSION`                                         | PHP image tag                                                |
 | `FRANKENPHP_VERSION`                                  | FrankenPHP image tag                                         |
 | `COMPOSER_VERSION`                                    | Composer image tag                                           |
@@ -49,8 +42,5 @@ Real secrets are never committed.
 
 ## Secrets
 
-- Never commit a local override (`.env.local`, `.env.prod.local`,
-  `.env.preprod.local`) or any token.
+- Never commit a local override (`.env.local`) or any token.
 - Rotate any value that leaks (tokens, passwords).
-- Production secrets live only on the deploy host (`.env.prod.local`) and in
-  the CI secrets store.

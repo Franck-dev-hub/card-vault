@@ -1,5 +1,9 @@
 # Backend architecture
 
+API Platform exposes the API. The interactive OpenAPI documentation is the
+canonical reference: `http://card-vault.localhost/api/docs` in dev. The table
+below is a summary; any change to the endpoints must keep one row here.
+
 ## Endpoints (API Platform)
 
 | Method | Path                                         | Auth | Purpose                          |
@@ -47,3 +51,8 @@ Doctrine Migrations, fixtures for test data. No tables defined yet.
 
 None yet. The `make migrate` and `make migrate-diff` targets call the standard
 Doctrine commands.
+
+## Adding a card game
+
+Card games plug in through the external client plus normaliser pattern. See
+[Add a card game (licence)](tcg-integration.md).

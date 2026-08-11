@@ -12,16 +12,18 @@ def create_app() -> FastAPI:
         redoc_url=None,
     )
 
-    # CORS Configuration
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=[
+            "http://localhost:3000",
+            "http://card-vault.localhost",
+            "http://card-vault.preprod",
+        ],
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],
     )
 
-    # Include Routers
     app.include_router(predict_router, prefix="/ml/api/v1")
 
     @app.get("/ml/health")

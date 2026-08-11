@@ -58,6 +58,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["card-vault.localhost"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"

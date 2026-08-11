@@ -114,7 +114,7 @@ ARG GROUP_ID
 # hadolint ignore=DL3008
 RUN <<-EOF
     apt-get update
-    apt-get install -y --no-install-recommends git
+    apt-get install -y --no-install-recommends git unzip
     rm -rf /var/lib/apt/lists/*
     install-php-extensions pcov
 EOF

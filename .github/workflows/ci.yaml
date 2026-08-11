@@ -23,7 +23,7 @@ jobs:
 
       - name: Build CI image
         if: hashFiles('apps/api/composer.json') != ''
-        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml build php
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local build php
 
       - name: Lint
         if: hashFiles('apps/api/composer.json') != ''
@@ -99,7 +99,7 @@ jobs:
 
       - name: Build Playwright image
         if: hashFiles('apps/frontend/package.json') != ''
-        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --profile e2e build playwright
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local --profile e2e build playwright
 
       - name: Run E2E
         if: hashFiles('apps/frontend/package.json') != ''

@@ -10,6 +10,7 @@ DC_CI = docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-fi
 # Environments and which ones pull GHCR images before starting
 ENVS := dev preprod prod
 PULL_ENVS := preprod prod
+SERVICES := frontend backend ml
 
 dev_DC = $(DC_DEV)
 preprod_DC = $(DC_PREPROD)
@@ -21,7 +22,6 @@ prod_DC = $(DC_PROD)
 .PHONY: release/preprod release/prod
 
 # === ENV ===
-
 # Generate gitignored local overrides. The tracked placeholders (.env, .env.prod,
 # .env.preprod) are committed as-is and never carry real secrets.
 env:
@@ -69,21 +69,18 @@ endef
 
 # === ENVIRONMENTS ===
 
-# UP: Start an environment (preprod/prod pull GHCR images first)
 %/up:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up -d
 
-# BUILD ALL: Build and start (dev builds locally, preprod/prod pull + start)
 %/build:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up --build -d
 
-# BUILD SERVICE: Rebuild/restart a single service (works for ANY service in that env)
 define service-build-rule
 $(1)/build/%:
 	$$($(1)_DC) up --build --no-deps -d $$*
@@ -91,14 +88,12 @@ endef
 $(foreach env,$(ENVS),$(eval $(call service-build-rule,$(env))))
 $(eval .PHONY: $(ENVS:%=%/build/%))
 
-# PULL: Pull GHCR images for an environment
 %/pull:
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$($*_DC) pull
 
 # === LINTING ===
-
 lint/frontend:
 	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm run lint && corepack pnpm exec tsc --noEmit"
 
@@ -111,7 +106,6 @@ lint/ml:
 lint: lint/frontend lint/backend lint/ml
 
 # === SECURITY ===
-
 sec/frontend:
 	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm audit"
 
@@ -124,7 +118,6 @@ sec/ml:
 sec: sec/frontend sec/backend sec/ml
 
 # === TEST ===
-
 test/backend:
 	$(DC_CI) up -d database redis
 	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && php bin/phpunit"
@@ -142,7 +135,6 @@ test/e2e:
 test: test/backend test/frontend test/ml test/e2e
 
 # === MIGRATIONS ===
-
 migrate:
 	$(DC_CI) run --rm --no-deps -e APP_ENV=dev php sh -c "composer install --no-interaction --prefer-dist && php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing --allow-no-migration"
 
@@ -150,18 +142,12 @@ migrate-diff:
 	$(DC_CI) run --rm --no-deps -e APP_ENV=dev php sh -c "composer install --no-interaction --prefer-dist && php bin/console doctrine:migrations:diff"
 
 # === CI ===
-
-# Run the exact same checks as .github/workflows/ci.yaml, locally
 ci: lint sec test/backend test/frontend test/ml
 
 # === RELEASES (gitflow) ===
-
-# Feature/fix/chore/doc branches merge into develop.
-# When develop is validated: deploy to preprod (preprod branch, same env as prod).
 release/preprod:
 	gh pr create --base preprod --head develop --title "release: develop -> preprod" --fill
 
-# When preprod is validated: deploy to prod.
 release/prod:
 	gh pr create --base prod --head preprod --title "release: preprod -> prod" --fill
 
@@ -171,8 +157,8 @@ prune:
 
 # === HELP ===
 help:
-	@echo " Services : frontend, backend, ml "
-	@echo " Environments : dev, preprod, prod "
+	@echo " Services : $(SERVICES)"
+	@echo " Environments : $(ENVS)"
 	@echo ""
 	@echo "----- ENVIRONMENTS -----------------------"
 	@echo "  env                   -> Generate gitignored local env overrides"

@@ -72,15 +72,15 @@ jobs:
         run: make env
 
       - name: Lint
-        if: hashFiles('apps/ml/requirements.txt') != ''
+        if: hashFiles('apps/ml/pyproject.toml') != ''
         run: make lint/ml
 
       - name: Security audit
-        if: hashFiles('apps/ml/requirements.txt') != ''
+        if: hashFiles('apps/ml/pyproject.toml') != ''
         run: make sec/ml
 
       - name: Tests
-        if: hashFiles('apps/ml/requirements.txt') != ''
+        if: hashFiles('apps/ml/pyproject.toml') != ''
         run: make test/ml
 
   e2e:

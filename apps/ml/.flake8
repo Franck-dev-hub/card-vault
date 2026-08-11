@@ -1,0 +1,9 @@
+[flake8]
+max-line-length = 79
+max-doc-length = 72
+exclude =
+    .venv,
+    __pycache__,
+    __init__.py,
+    .git,
+    *.egg-info

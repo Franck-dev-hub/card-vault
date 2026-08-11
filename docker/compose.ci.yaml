@@ -1,0 +1,64 @@
+name: ${PROJECT_NAME:?error}
+
+services:
+  php:
+    image: ${DOCKER_REGISTRY:?error}/ci/php:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: php_ci
+      args:
+        PHP_VERSION: ${PHP_VERSION:?error}
+        COMPOSER_VERSION: ${COMPOSER_VERSION:?error}
+        PHP_EXTENSIONS: ${PHP_EXTENSIONS:?error}
+        USER: ${PROJECT_NAME:?error}
+        USER_ID: ${PROJECT_USER_ID:?error}
+        GROUP_ID: ${PROJECT_GROUP_ID:?error}
+    working_dir: /home/${PROJECT_NAME:?error}/sources/api
+    volumes:
+      - ../apps:/home/${PROJECT_NAME:?error}/sources
+    environment:
+      APP_ENV: test
+      APP_DEBUG: 1
+      DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
+      REDIS_URL: redis://redis:6379
+      CONTAINER_USER: ${PROJECT_NAME:?error}
+
+  database:
+    image: postgres:${POSTGRES_VERSION:?error}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?error}
+      POSTGRES_USER: ${POSTGRES_USER:?error}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?error}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?error} -d ${POSTGRES_DB:?error}"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:${REDIS_VERSION:?error}-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  playwright:
+    image: ${DOCKER_REGISTRY:?error}/ci/playwright:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: docker/tests/Dockerfile
+      args:
+        USER: ${PROJECT_NAME:?error}
+        USER_ID: ${PROJECT_USER_ID:?error}
+        GROUP_ID: ${PROJECT_GROUP_ID:?error}
+    profiles: ["e2e"]
+    working_dir: /app
+    user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
+    volumes:
+      - ../apps/frontend:/app
+    environment:
+      CI: "1"

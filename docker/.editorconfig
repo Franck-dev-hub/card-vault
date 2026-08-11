@@ -1,0 +1,18 @@
+; EditorConfig for the docker/ directory
+root = true
+
+[*.{yaml,yml}]
+indent_style = space
+indent_size = 2
+
+[*Caddyfile]
+indent_style = tab
+indent_size = 4
+
+[*.sh]
+indent_style = space
+indent_size = 4
+
+[*.ini]
+indent_style = space
+indent_size = 4

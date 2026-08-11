@@ -1,0 +1,38 @@
+name: ${PROJECT_NAME:?error}
+
+# Preprod overrides: pull GHCR images, run migrations on boot, exposed on 8080/8443.
+services:
+  caddy:
+    ports:
+      - "80:80"
+    volumes:
+      - ./caddy/proxy.preprod.Caddyfile:/etc/caddy/Caddyfile:ro
+
+  api:
+    build: !reset
+    depends_on:
+      database:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    build: !reset
+
+  ml:
+    build: !reset
+
+  migrate:
+    image: ${DOCKER_REGISTRY:?error}/api/${PROJECT_ENV:?error}:${PROJECT_IMAGE_TAG:-latest}
+    command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction", "--all-or-nothing", "--allow-no-migration"]
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:?error}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
+      REDIS_URL: redis://redis:6379
+      CONTAINER_USER: ${PROJECT_NAME:?error}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: "no"

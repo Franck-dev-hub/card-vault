@@ -1,0 +1,119 @@
+name: ${PROJECT_NAME:?error}
+
+services:
+  caddy:
+    image: caddy:${CADDY_VERSION:?error}
+    restart: unless-stopped
+    environment:
+      CADDY_DOMAIN_NAME: ${PROJECT_DOMAIN:?error}
+    volumes:
+      - ./caddy/proxy.Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+      ml:
+        condition: service_healthy
+
+  api:
+    image: ${DOCKER_REGISTRY:?error}/api/${PROJECT_ENV:?error}:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: frankenphp_release
+      args:
+        NODEJS_VERSION: ${NODEJS_VERSION:?error}
+        PHP_VERSION: ${PHP_VERSION:?error}
+        FRANKENPHP_VERSION: ${FRANKENPHP_VERSION:?error}
+        COMPOSER_VERSION: ${COMPOSER_VERSION:?error}
+        PHP_EXTENSIONS: ${PHP_EXTENSIONS:?error}
+        SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
+        USER: ${PROJECT_NAME:?error}
+        USER_ID: ${PROJECT_USER_ID:?error}
+        GROUP_ID: ${PROJECT_GROUP_ID:?error}
+    restart: unless-stopped
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:?error}
+      DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
+      REDIS_URL: redis://redis:6379
+      SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
+      CADDY_ROOT_FOLDER: /home/${PROJECT_NAME:?error}/sources/api/public
+      CADDY_CORS_ORIGIN: ${PROJECT_DOMAIN:?error}
+      CONTAINER_USER: ${PROJECT_NAME:?error}
+    volumes:
+      - api_var:/home/${PROJECT_NAME:?error}/sources/api/var
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: ${DOCKER_REGISTRY:?error}/frontend/${PROJECT_ENV:?error}:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: docker/frontend/Dockerfile
+      args:
+        NODEJS_VERSION: ${NODEJS_VERSION:?error}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+
+  ml:
+    image: ${DOCKER_REGISTRY:?error}/ml/${PROJECT_ENV:?error}:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ..
+      dockerfile: docker/ml/Dockerfile
+      args:
+        PYTHON_VERSION: ${PYTHON_VERSION:?error}
+        USER: ${PROJECT_NAME:?error}
+        USER_ID: ${PROJECT_USER_ID:?error}
+        GROUP_ID: ${PROJECT_GROUP_ID:?error}
+    restart: unless-stopped
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  database:
+    image: postgres:${POSTGRES_VERSION:?error}-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?error}
+      POSTGRES_USER: ${POSTGRES_USER:?error}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?error}
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?error} -d ${POSTGRES_DB:?error}"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:${REDIS_VERSION:?error}-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - redis_data:/data
+
+volumes:
+  database_data:
+  redis_data:
+  api_var:
+  caddy_data:
+  caddy_config:

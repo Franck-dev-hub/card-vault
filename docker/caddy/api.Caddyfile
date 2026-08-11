@@ -1,0 +1,30 @@
+# FrankenPHP embedded Caddy - serves the Symfony/API Platform app on :8000
+# The front proxy (Caddy) routes /api/* here and terminates TLS.
+{
+	admin 127.0.0.1:2019
+}
+
+:8000 {
+	root * {$CADDY_ROOT_FOLDER}
+	php_server
+
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+	}
+
+	# CORS for the Angular frontend (same-origin in prod, explicit in dev)
+	@cors_preflight method OPTIONS
+	handle @cors_preflight {
+		header Access-Control-Allow-Origin {$CADDY_CORS_ORIGIN:*}
+		header Access-Control-Allow-Methods "GET, POST, PATCH, DELETE, OPTIONS"
+		header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+		header Access-Control-Max-Age "3600"
+		respond 204
+	}
+	header Access-Control-Allow-Origin {$CADDY_CORS_ORIGIN:*}
+	header Access-Control-Allow-Methods "GET, POST, PATCH, DELETE, OPTIONS"
+	header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+}

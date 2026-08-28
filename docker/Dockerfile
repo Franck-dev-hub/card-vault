@@ -214,6 +214,10 @@ LABEL org.opencontainers.image.version=${RELEASE_VERSION}
 COPY --from=app_sources --chown=${USER_ID}:${GROUP_ID} /sources /home/${USER}/sources/api
 COPY --from=app_sources /share/docker-entrypoint-share.sh /usr/local/lib/docker-entrypoint-share.sh
 
+# Pre-chown var/ for the api_var volume, dev/CI use the `user:` override instead.
+RUN mkdir -p /home/${USER}/sources/api/var/cache /home/${USER}/sources/api/var/log \
+    && chown -R ${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/var
+
 COPY --link docker/php/php.prod.ini $PHP_INI_DIR/conf.d/prod.ini
 RUN sed -i "s/__USER__/${USER}/" "$PHP_INI_DIR/conf.d/prod.ini"
 COPY --link docker/caddy/api.Caddyfile /etc/frankenphp/Caddyfile

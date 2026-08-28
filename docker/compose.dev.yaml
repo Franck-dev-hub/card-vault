@@ -26,6 +26,7 @@ services:
         USER_ID: ${PROJECT_USER_ID:?error}
         GROUP_ID: ${PROJECT_GROUP_ID:?error}
     hostname: api
+    user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
     environment:
       APP_ENV: dev
       APP_DEBUG: 1

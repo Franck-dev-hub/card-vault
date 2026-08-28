@@ -1,4 +1,6 @@
 .DEFAULT_GOAL := help
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
 
 # Variables
 # Base .env first, then per-env overrides, gitignored local secrets last
@@ -20,10 +22,12 @@ prod_DC = $(DC_PROD)
 .PHONY: lint lint/frontend lint/backend lint/ml sec sec/frontend sec/backend sec/ml
 .PHONY: test test/backend test/frontend test/ml test/e2e migrate migrate-diff ci
 .PHONY: release/preprod release/prod
+.PHONY: FORCE
+
+FORCE:
 
 # === ENV ===
-# Generate gitignored local overrides. The tracked placeholders (.env, .env.prod,
-# .env.preprod) are committed as-is and never carry real secrets.
+# Generate gitignored local overrides.
 env:
 	@test -f .env.local || { \
 		cp .env .env.local; \
@@ -33,35 +37,34 @@ env:
 	}
 	@echo ".env.local ready (dev, full copy with generated secrets)."
 
-env/prod:
-	@test -f .env.prod.local || { \
+define generate-env-overrides
+	@test -f .env.$(1).local || { \
 		{ \
-			echo "# Prod secrets, gitignored, override .env.prod"; \
+			echo "# $(2) secrets, gitignored, override .env.$(1)"; \
 			echo "APP_SECRET=$$(openssl rand -hex 32)"; \
 			echo "POSTGRES_PASSWORD=$$(openssl rand -hex 16)"; \
 			echo "PGADMIN_PASSWORD=$$(openssl rand -hex 16)"; \
 			echo "HF_TOKEN="; \
-		} > .env.prod.local; \
+		} > .env.$(1).local; \
 	}
-	@echo ".env.prod.local ready (secret overrides only)."
+	@echo ".env.$(1).local ready (secret overrides only)."
+endef
+
+env/prod:
+	$(call generate-env-overrides,prod,Prod)
 
 env/preprod:
-	@test -f .env.preprod.local || { \
-		{ \
-			echo "# Preprod secrets, gitignored, override .env.preprod"; \
-			echo "APP_SECRET=$$(openssl rand -hex 32)"; \
-			echo "POSTGRES_PASSWORD=$$(openssl rand -hex 16)"; \
-			echo "PGADMIN_PASSWORD=$$(openssl rand -hex 16)"; \
-			echo "HF_TOKEN="; \
-		} > .env.preprod.local; \
-	}
-	@echo ".env.preprod.local ready (secret overrides only)."
+	$(call generate-env-overrides,preprod,Preprod)
 
-# Abort when a non-dev environment still uses placeholder secrets
+# Abort when a non-dev environment is missing secrets or still uses placeholders
 define check-secrets
-	@for key in APP_SECRET POSTGRES_PASSWORD; do \
-		if grep -q "^$$key=change-me$$" ".env.$(1).local" 2>/dev/null; then \
-			echo "ERROR: $$key is still a placeholder in .env.$(1).local. Run 'make env/$(1)' or fill in real values."; \
+	@if [ ! -s ".env.$(1).local" ]; then \
+		echo "ERROR: .env.$(1).local is missing or empty. Run 'make env/$(1)'."; \
+		exit 1; \
+	fi
+	@for key in APP_SECRET POSTGRES_PASSWORD PGADMIN_PASSWORD; do \
+		if ! grep -q "^$$key=" ".env.$(1).local" || grep -q "^$$key=change-me$$" ".env.$(1).local"; then \
+			echo "ERROR: $$key is missing or still a placeholder in .env.$(1).local. Run 'make env/$(1)' or fill in real values."; \
 			exit 1; \
 		fi; \
 	done
@@ -69,26 +72,25 @@ endef
 
 # === ENVIRONMENTS ===
 
-%/up:
+%/up: FORCE
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up -d
 
-%/build:
+%/build: FORCE
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up --build -d
 
 define service-build-rule
-$(1)/build/%:
+$(1)/build/%: FORCE
 	$$($(1)_DC) up --build --no-deps -d $$*
 endef
 $(foreach env,$(ENVS),$(eval $(call service-build-rule,$(env))))
-$(eval .PHONY: $(ENVS:%=%/build/%))
 
-%/pull:
+%/pull: FORCE
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$($*_DC) pull
@@ -169,15 +171,15 @@ help:
 	@echo ""
 	@echo "----- LINTING ---------------------------"
 	@echo "  lint           -> Run all linters"
-	@echo "  lint/{service} -> ESLint + TypeScript (apps/frontend)"
+	@echo "  lint/{service} -> Run linter for one service"
 	@echo ""
 	@echo "----- SECURITY ---------------------------"
 	@echo "  sec           -> Run all security checks"
-	@echo "  sec/{service} -> pnpm audit (apps/frontend)"
+	@echo "  sec/{service} -> Run security check for one service"
 	@echo ""
 	@echo "----- TEST -------------------------------"
 	@echo "  test           -> Run all tests"
-	@echo "  test/{service} -> PHPUnit (apps/api)"
+	@echo "  test/{service} -> Run test for one service"
 	@echo "  test/e2e       -> Playwright (apps/frontend)"
 	@echo ""
 	@echo "----- MIGRATIONS --------------------------"

@@ -39,6 +39,7 @@ services:
       APP_ENV: prod
       APP_DEBUG: 0
       APP_SECRET: ${APP_SECRET:?error}
+      DEFAULT_URI: ${DEFAULT_URI:?error}
       DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
       REDIS_URL: redis://redis:6379
       SESSION_LIFETIME: ${SESSION_LIFETIME:?error}

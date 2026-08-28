@@ -7,6 +7,9 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.3",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2.11",
@@ -17,10 +20,12 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.95.18",
         "phpstan/phpstan": "^2.2.8",
+        "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-symfony": "^2.0.20",
         "phpunit/phpunit": "^13.3",
         "symfony/browser-kit": "7.4.*",
-        "symfony/css-selector": "7.4.*"
+        "symfony/css-selector": "7.4.*",
+        "symfony/maker-bundle": "^1.67"
     },
     "config": {
         "allow-plugins": {

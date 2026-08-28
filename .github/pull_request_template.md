@@ -1,17 +1,9 @@
 ## Description
 
 ## Type
-
-- [ ] Feature
-- [ ] Fix
-- [ ] Refactor
-- [ ] Docs
-- [ ] Tests
-- [ ] Other
+Feature, Fix, Refactor, Docs, Tests, Other
 
 ## Related issues
-
-<!-- e.g. Fixes #12 -->
 
 ## Checklist
 

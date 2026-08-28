@@ -123,6 +123,10 @@ $(foreach env,$(ENVS),$(eval $(call service-build-rule,$(env))))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$($*_DC) pull
 
+%/stop: FORCE
+	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
+	$($*_DC) stop
+
 # === LINTING ===
 lint/frontend:
 	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm run lint && corepack pnpm exec tsc --noEmit"
@@ -196,6 +200,7 @@ help:
 	@echo "  {env}/build           -> Build + start"
 	@echo "  {env}/build/{service} -> Rebuild/restart one service"
 	@echo "  {env}/pull            -> Pull GHCR images for that environment"
+	@echo "  {env}/stop            -> Stop an environment"
 	@echo ""
 	@echo "----- LINTING ---------------------------"
 	@echo "  lint           -> Run all linters"

@@ -70,6 +70,32 @@ define check-secrets
 	done
 endef
 
+# Display URLs for the given environment
+define display-urls
+	@echo ""; \
+	echo "✓ Environment $(1) is running"; \
+	echo ""; \
+	if [ "$(1)" = "dev" ]; then \
+		domain=$$(grep '^PROJECT_DOMAIN=' .env | cut -d= -f2); \
+		echo "Services:"; \
+		echo "  Frontend:      http://$$domain"; \
+		echo "  API:           http://$$domain/api"; \
+		echo "  ML:            http://$$domain/ml"; \
+		echo "  PgAdmin:       http://localhost:5050"; \
+		echo "  RedisInsight:  http://localhost:5540"; \
+		echo "  Mailpit:       http://localhost:8025"; \
+		echo "  Postgres:      postgresql://localhost:5432"; \
+		echo "  Redis:         redis://localhost:6379"; \
+	elif [ "$(1)" = "preprod" ] || [ "$(1)" = "prod" ]; then \
+		domain=$$(grep '^PROJECT_DOMAIN=' .env.$(1) | cut -d= -f2); \
+		echo "Services:"; \
+		echo "  Frontend:      https://$$domain"; \
+		echo "  API:           https://$$domain/api"; \
+		echo "  ML:            https://$$domain/ml"; \
+	fi; \
+	echo ""
+endef
+
 # === ENVIRONMENTS ===
 
 %/up: FORCE
@@ -77,12 +103,14 @@ endef
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up -d
+	$(call display-urls,$*)
 
 %/build: FORCE
 	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
 	$($*_DC) up --build -d
+	$(call display-urls,$*)
 
 define service-build-rule
 $(1)/build/%: FORCE

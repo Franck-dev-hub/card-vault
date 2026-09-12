@@ -19,183 +19,14 @@ dev_DC = $(DC_DEV)
 preprod_DC = $(DC_PREPROD)
 prod_DC = $(DC_PROD)
 
-.PHONY: help env env/prod env/preprod terminal
-.PHONY: lint lint/frontend lint/backend lint/ml lint/doctrine sec sec/frontend sec/backend sec/ml
-.PHONY: test test/backend test/frontend test/ml test/e2e test/infection migrate migrate-diff ci
-.PHONY: release/preprod release/prod
-.PHONY: FORCE
+.PHONY: help ci FORCE
 
 FORCE:
 
-# === ENV ===
-# Generate gitignored local overrides.
-env:
-	@test -f .env.local || { \
-		cp .env .env.local; \
-		secret=$$(openssl rand -hex 32); \
-		password=$$(openssl rand -hex 16); \
-		sed -i "s/^APP_SECRET=.*/APP_SECRET=$$secret/; s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$$password/; s/^PGADMIN_PASSWORD=.*/PGADMIN_PASSWORD=$$password/" .env.local; \
-	}
-	@echo ".env.local ready (dev, full copy with generated secrets)."
-
-define generate-env-overrides
-	@test -f .env.$(1).local || { \
-		{ \
-			echo "# $(2) secrets, gitignored, override .env.$(1)"; \
-			echo "APP_SECRET=$$(openssl rand -hex 32)"; \
-			echo "POSTGRES_PASSWORD=$$(openssl rand -hex 16)"; \
-			echo "PGADMIN_PASSWORD=$$(openssl rand -hex 16)"; \
-			echo "HF_TOKEN="; \
-		} > .env.$(1).local; \
-	}
-	@echo ".env.$(1).local ready (secret overrides only)."
-endef
-
-env/prod:
-	$(call generate-env-overrides,prod,Prod)
-
-env/preprod:
-	$(call generate-env-overrides,preprod,Preprod)
-
-# Abort when a non-dev environment is missing secrets or still uses placeholders
-define check-secrets
-	@if [ ! -s ".env.$(1).local" ]; then \
-		echo "ERROR: .env.$(1).local is missing or empty. Run 'make env/$(1)'."; \
-		exit 1; \
-	fi
-	@for key in APP_SECRET POSTGRES_PASSWORD PGADMIN_PASSWORD; do \
-		if ! grep -q "^$$key=" ".env.$(1).local" || grep -q "^$$key=change-me$$" ".env.$(1).local"; then \
-			echo "ERROR: $$key is missing or still a placeholder in .env.$(1).local. Run 'make env/$(1)' or fill in real values."; \
-			exit 1; \
-		fi; \
-	done
-endef
-
-# Display URLs for the given environment
-define display-urls
-	@echo ""; \
-	echo "✓ Environment $(1) is running"; \
-	echo ""; \
-	if [ "$(1)" = "dev" ]; then \
-		domain=$$(grep '^PROJECT_DOMAIN=' .env | cut -d= -f2); \
-		echo "Services:"; \
-		echo "  Frontend:      http://$$domain"; \
-		echo "  API:           http://$$domain/api"; \
-		echo "  ML:            http://$$domain/ml"; \
-		echo "  PgAdmin:       http://localhost:5050"; \
-		echo "  RedisInsight:  http://localhost:5540"; \
-		echo "  Mailpit:       http://localhost:8025"; \
-		echo "  Postgres:      postgresql://localhost:5432"; \
-		echo "  Redis:         redis://localhost:6379"; \
-	elif [ "$(1)" = "preprod" ] || [ "$(1)" = "prod" ]; then \
-		domain=$$(grep '^PROJECT_DOMAIN=' .env.$(1) | cut -d= -f2); \
-		echo "Services:"; \
-		echo "  Frontend:      https://$$domain"; \
-		echo "  API:           https://$$domain/api"; \
-		echo "  ML:            https://$$domain/ml"; \
-	fi; \
-	echo ""
-endef
-
-# === ENVIRONMENTS ===
-
-%/up: FORCE
-	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
-	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
-	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
-	$($*_DC) up -d
-	$(call display-urls,$*)
-
-%/build: FORCE
-	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
-	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
-	$(if $(filter $*,$(PULL_ENVS)),$($*_DC) pull)
-	$($*_DC) up --build -d
-	$(call display-urls,$*)
-
-define service-build-rule
-$(1)/build/%: FORCE
-	$$($(1)_DC) up --build --no-deps -d $$*
-endef
-$(foreach env,$(ENVS),$(eval $(call service-build-rule,$(env))))
-
-%/pull: FORCE
-	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
-	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
-	$($*_DC) pull
-
-%/stop: FORCE
-	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
-	$($*_DC) stop
-
-terminal:
-	$(DC_DEV) run --rm api bash
-
-# === LINTING ===
-lint/frontend:
-	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm run lint && corepack pnpm exec tsc --noEmit"
-
-lint/backend:
-	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && composer validate --strict && vendor/bin/phpstan analyse && vendor/bin/php-cs-fixer fix --dry-run --diff && vendor/bin/rector process --dry-run && bin/console lint:container -e prod"
-
-lint/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "uv run ruff check . && uv run mypy ."
-
-lint/doctrine:
-	$(DC_CI) up -d database
-	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && bin/console doctrine:schema:validate --skip-sync"
-
-lint: lint/frontend lint/backend lint/ml lint/doctrine
-
-# === SECURITY ===
-sec/frontend:
-	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm audit"
-
-sec/backend:
-	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && composer audit"
-
-sec/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "uv run --with pip-audit pip-audit"
-
-sec: sec/frontend sec/backend sec/ml
-
-# === TEST ===
-test/backend:
-	$(DC_CI) up -d database redis
-	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && php bin/phpunit"
-
-test/frontend:
-	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm test"
-
-test/ml:
-	$(DC_DEV) run --rm --no-deps ml sh -c "uv run --with pytest pytest"
-
-test/e2e:
-	$(DC_DEV) up -d
-	$(DC_CI) --profile e2e run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 playwright sh -c "corepack pnpm install && corepack pnpm run test:e2e"
-
-test/infection:
-	$(DC_CI) up -d database redis
-	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && vendor/bin/infection --coverage=var/coverage"
-
-test: test/backend test/frontend test/ml test/e2e test/infection
-
-# === MIGRATIONS ===
-migrate:
-	$(DC_CI) run --rm --no-deps -e APP_ENV=dev php sh -c "composer install --no-interaction --prefer-dist && php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing --allow-no-migration"
-
-migrate-diff:
-	$(DC_CI) run --rm --no-deps -e APP_ENV=dev php sh -c "composer install --no-interaction --prefer-dist && php bin/console doctrine:migrations:diff"
+include $(wildcard make/*.mk)
 
 # === CI ===
 ci: lint sec test/backend test/frontend test/ml test/infection
-
-# === RELEASES (gitflow) ===
-release/preprod:
-	gh pr create --base preprod --head develop --title "release: develop -> preprod" --fill
-
-release/prod:
-	gh pr create --base prod --head preprod --title "release: preprod -> prod" --fill
 
 # === HELP ===
 help:
@@ -212,9 +43,11 @@ help:
 	@echo "  terminal              -> Open a shell in the backend PHP container"
 	@echo ""
 	@echo "----- LINTING ---------------------------"
-	@echo "  lint           -> Run all linters"
-	@echo "  lint/{service} -> Run linter for one service"
-	@echo "  lint/doctrine  -> Validate Doctrine schema"
+	@echo "  lint               -> Run all linters"
+	@echo "  lint/{service}     -> Run linter for one service"
+	@echo "  lint/doctrine      -> Validate Doctrine schema"
+	@echo "  lint/fix           -> Auto-fix all services"
+	@echo "  lint/{service}/fix -> Auto-fix one service"
 	@echo ""
 	@echo "----- SECURITY ---------------------------"
 	@echo "  sec           -> Run all security checks"

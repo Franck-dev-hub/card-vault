@@ -48,10 +48,12 @@ make dev/up     # start the stack after a build
 
 ```bash
 make lint           # lint all stacks
+make lint/fix        # auto-fix what can be
 make test/backend   # PHPUnit
 make test/frontend  # Vitest (needs apps/frontend deps)
 make test/ml        # pytest
 make test/e2e       # Playwright
+make test/infection # Infection mutation testing
 make ci             # lint + security + all tests
 ```
 

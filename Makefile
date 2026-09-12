@@ -8,6 +8,7 @@ DC_DEV = docker compose -f docker/compose.yaml -f docker/compose.dev.yaml --env-
 DC_PROD = docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local
 DC_PREPROD = docker compose -f docker/compose.yaml -f docker/compose.preprod.yaml --env-file .env --env-file .env.preprod --env-file .env.preprod.local
 DC_CI = docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local
+RUN_FRONTEND = $(DC_DEV) run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 frontend
 
 # Environments and which ones pull GHCR images before starting
 ENVS := dev preprod prod
@@ -18,9 +19,9 @@ dev_DC = $(DC_DEV)
 preprod_DC = $(DC_PREPROD)
 prod_DC = $(DC_PROD)
 
-.PHONY: help env env/prod env/preprod prune
-.PHONY: lint lint/frontend lint/backend lint/ml sec sec/frontend sec/backend sec/ml
-.PHONY: test test/backend test/frontend test/ml test/e2e migrate migrate-diff ci
+.PHONY: help env env/prod env/preprod terminal
+.PHONY: lint lint/frontend lint/backend lint/ml lint/doctrine sec sec/frontend sec/backend sec/ml
+.PHONY: test test/backend test/frontend test/ml test/e2e test/infection migrate migrate-diff ci
 .PHONY: release/preprod release/prod
 .PHONY: FORCE
 
@@ -123,21 +124,32 @@ $(foreach env,$(ENVS),$(eval $(call service-build-rule,$(env))))
 	$(if $(filter $*,$(PULL_ENVS)),$(call check-secrets,$*))
 	$($*_DC) pull
 
+%/stop: FORCE
+	$(if $(filter $*,$(ENVS)),,$(error Unknown environment "$*". Valid environments: $(ENVS)))
+	$($*_DC) stop
+
+terminal:
+	$(DC_DEV) run --rm api bash
+
 # === LINTING ===
 lint/frontend:
-	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm run lint && corepack pnpm exec tsc --noEmit"
+	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm run lint && corepack pnpm exec tsc --noEmit"
 
 lint/backend:
-	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && vendor/bin/phpstan analyse && vendor/bin/php-cs-fixer fix --dry-run --diff"
+	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && composer validate --strict && vendor/bin/phpstan analyse && vendor/bin/php-cs-fixer fix --dry-run --diff && vendor/bin/rector process --dry-run && bin/console lint:container -e prod"
 
 lint/ml:
 	$(DC_DEV) run --rm --no-deps ml sh -c "uv run ruff check . && uv run mypy ."
 
-lint: lint/frontend lint/backend lint/ml
+lint/doctrine:
+	$(DC_CI) up -d database
+	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && bin/console doctrine:schema:validate --skip-sync"
+
+lint: lint/frontend lint/backend lint/ml lint/doctrine
 
 # === SECURITY ===
 sec/frontend:
-	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm audit"
+	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm audit"
 
 sec/backend:
 	$(DC_CI) run --rm --no-deps php sh -c "composer install --no-interaction --prefer-dist && composer audit"
@@ -153,16 +165,20 @@ test/backend:
 	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && php bin/phpunit"
 
 test/frontend:
-	$(DC_DEV) run --rm --no-deps frontend sh -c "corepack pnpm install && corepack pnpm test"
+	$(RUN_FRONTEND) sh -c "corepack pnpm install && corepack pnpm test"
 
 test/ml:
 	$(DC_DEV) run --rm --no-deps ml sh -c "uv run --with pytest pytest"
 
 test/e2e:
 	$(DC_DEV) up -d
-	$(DC_CI) --profile e2e run --rm --no-deps playwright sh -c "corepack pnpm install && corepack pnpm run test:e2e"
+	$(DC_CI) --profile e2e run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 playwright sh -c "corepack pnpm install && corepack pnpm run test:e2e"
 
-test: test/backend test/frontend test/ml test/e2e
+test/infection:
+	$(DC_CI) up -d database redis
+	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && vendor/bin/infection --coverage=var/coverage"
+
+test: test/backend test/frontend test/ml test/e2e test/infection
 
 # === MIGRATIONS ===
 migrate:
@@ -172,7 +188,7 @@ migrate-diff:
 	$(DC_CI) run --rm --no-deps -e APP_ENV=dev php sh -c "composer install --no-interaction --prefer-dist && php bin/console doctrine:migrations:diff"
 
 # === CI ===
-ci: lint sec test/backend test/frontend test/ml
+ci: lint sec test/backend test/frontend test/ml test/infection
 
 # === RELEASES (gitflow) ===
 release/preprod:
@@ -180,10 +196,6 @@ release/preprod:
 
 release/prod:
 	gh pr create --base prod --head preprod --title "release: preprod -> prod" --fill
-
-prune:
-	git fetch --prune
-	git branch --format '%(refname:short) %(upstream:track)' | awk '$$2 == "[gone]" {print $$1}' | xargs -r git branch -d
 
 # === HELP ===
 help:
@@ -196,10 +208,13 @@ help:
 	@echo "  {env}/build           -> Build + start"
 	@echo "  {env}/build/{service} -> Rebuild/restart one service"
 	@echo "  {env}/pull            -> Pull GHCR images for that environment"
+	@echo "  {env}/stop            -> Stop an environment"
+	@echo "  terminal              -> Open a shell in the backend PHP container"
 	@echo ""
 	@echo "----- LINTING ---------------------------"
 	@echo "  lint           -> Run all linters"
 	@echo "  lint/{service} -> Run linter for one service"
+	@echo "  lint/doctrine  -> Validate Doctrine schema"
 	@echo ""
 	@echo "----- SECURITY ---------------------------"
 	@echo "  sec           -> Run all security checks"
@@ -209,6 +224,7 @@ help:
 	@echo "  test           -> Run all tests"
 	@echo "  test/{service} -> Run test for one service"
 	@echo "  test/e2e       -> Playwright (apps/frontend)"
+	@echo "  test/infection -> Mutation testing"
 	@echo ""
 	@echo "----- MIGRATIONS --------------------------"
 	@echo "  migrate       -> Apply pending migrations"
@@ -220,5 +236,4 @@ help:
 	@echo "----- RELEASES ---------------------------"
 	@echo "  release/preprod -> Create PR develop → preprod"
 	@echo "  release/prod    -> Create PR preprod → prod"
-	@echo "  prune           -> Delete merged local branches"
 	@echo ""

@@ -55,6 +55,27 @@ make test/e2e       # Playwright
 make ci             # lint + security + all tests
 ```
 
+## Managing dependencies
+
+Frontend (pnpm):
+
+```bash
+docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
+  run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 frontend \
+  sh -c "corepack pnpm add <package>"
+
+docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
+  run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 frontend \
+  sh -c "corepack pnpm update --latest"
+```
+
+Backend (composer):
+
+```bash
+docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
+  run --rm --no-deps api sh -c "composer update"
+```
+
 ## Migrations
 
 ```bash

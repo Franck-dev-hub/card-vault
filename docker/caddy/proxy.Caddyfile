@@ -3,7 +3,15 @@
 {$CADDY_DOMAIN_NAME:localhost} {
 	encode zstd gzip
 
+	handle /api {
+		reverse_proxy api:8000
+	}
+
 	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle /bundles/* {
 		reverse_proxy api:8000
 	}
 

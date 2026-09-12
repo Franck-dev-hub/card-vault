@@ -72,7 +72,7 @@ services:
   ml:
     working_dir: /app
     user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000", "--reload", "--reload-exclude", "**/data_cache/*"]
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
       UV_CACHE_DIR: /tmp/.uv-cache

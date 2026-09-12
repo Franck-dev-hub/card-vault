@@ -77,11 +77,9 @@ ENV COMPOSER_HOME=/home/${USER}/.composer
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 COPY --from=node /usr/local/bin /usr/local/bin
 
-# git for patches applier, dnsutils for network debugging
-# hadolint ignore=DL3008
 RUN <<-EOF
     apt-get update
-    apt-get install -y --no-install-recommends git dnsutils
+    apt-get install -y --no-install-recommends git unzip dnsutils
     rm -rf /var/lib/apt/lists/*
     install-php-extensions xdebug pcov
 EOF

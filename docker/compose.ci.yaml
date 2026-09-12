@@ -53,6 +53,7 @@ services:
       context: ..
       dockerfile: docker/tests/Dockerfile
       args:
+        PLAYWRIGHT_VERSION: ${PLAYWRIGHT_VERSION:?error}
         USER: ${PROJECT_NAME:?error}
         USER_ID: ${PROJECT_USER_ID:?error}
         GROUP_ID: ${PROJECT_GROUP_ID:?error}

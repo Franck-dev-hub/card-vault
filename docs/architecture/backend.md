@@ -12,10 +12,10 @@ below is a summary; any change to the endpoints must keep one row here.
 | POST   | /api/login                                   | No   | Start a session                  |
 | POST   | /api/logout                                  | Yes  | Destroy the session              |
 | GET    | /api/me                                      | Yes  | Get the connected user           |
-| GET    | /api/license                                 | No   | List license                     |
-| GET    | /api/license/{slug}/extensions               | No   | List a game's extensions         |
-| GET    | /api/license/{slug}/extensions/{setId}/cards | No   | List an extension's cards        |
-| GET    | /api/license/{slug}/cards/{cardId}           | No   | Get a single card                |
+| GET    | /api/licence                                 | No   | List licences                    |
+| GET    | /api/licence/{slug}/extensions               | No   | List a game's extensions         |
+| GET    | /api/licence/{slug}/extensions/{setId}/cards | No   | List an extension's cards        |
+| GET    | /api/licence/{slug}/cards/{cardId}           | No   | Get a single card                |
 | GET    | /api/vault                                   | Yes  | List collection items            |
 | POST   | /api/vault                                   | Yes  | Add a collection item            |
 | PATCH  | /api/vault/{id}                              | Yes  | Update a collection item         |

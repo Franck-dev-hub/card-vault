@@ -6,29 +6,28 @@ an external client plus a normaliser.
 
 ## Reference legacy implementation
 
-The v1 project has the two reference integrations in `card_vault_v1`:
+The v1 project (`card_vault_v1`, a separate, unrelated Python/FastAPI
+codebase, sibling directory to this repo) has two reference integrations:
 
 - Pokémon: `backend/app/services/external/pokemon/` (TCGdex v2, no API key).
 - Magic: `backend/app/services/external/magic/` (Scryfall, no API key).
 
-Use them as the template for the next licence (e.g. Yu-Gi-Oh or Lorcana).
-
 ## Endpoint contract
 
-A licence must feed every `/api/license` endpoint:
+A licence must feed every `/api/licence` endpoint:
 
 | Endpoint                                           | Returns                    |
 |----------------------------------------------------|----------------------------|
-| `GET /api/license`                                 | List of supported licences |
-| `GET /api/license/{slug}/extensions`               | Extensions of a game       |
-| `GET /api/license/{slug}/extensions/{setId}/cards` | Cards of an extension      |
-| `GET /api/license/{slug}/cards/{cardId}`           | A single card              |
+| `GET /api/licence`                                 | List of supported licences |
+| `GET /api/licence/{slug}/extensions`               | Extensions of a game       |
+| `GET /api/licence/{slug}/extensions/{setId}/cards` | Cards of an extension      |
+| `GET /api/licence/{slug}/cards/{cardId}`           | A single card              |
 
 ## Card shape
 
 The normaliser must output a unified card. From the legacy implementation:
 
-- `license`, `card_id` (stable, e.g. `pokemon-base1-1`, `magic-{scryfall-id}`)
+- `licence`, `card_id` (stable, e.g. `pokemon-base1-1`, `magic-{scryfall-id}`)
 - `card_number`, `card_name`, `extension_id`, `extension_name`
 - `illustrator`, `rarity`
 - `card_image` (URL, and the medium variant if the source provides one)
@@ -43,8 +42,8 @@ source game.
 1. Create `apps/api/src/Service/Licence/{slug}/` following the legacy layout:
    the client (`{game}_api_services`) and the normaliser (`{game}_standardized`),
    decoupled by an interface.
-2. Register the licence in the dispatch map used by `/api/license`.
-3. Add the licence to `apps/api/resources/licenses.json`.
+2. Register the licence in the dispatch map used by `/api/licence`.
+3. Add the licence to `apps/api/resources/licences.json`.
 4. Update the [frontend licence filter](../architecture/frontend.md) if it
    hardcodes games.
 5. Add the licence row to the [backend endpoint doc](../architecture/backend.md)

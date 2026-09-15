@@ -4,6 +4,18 @@ declare(strict_types=1);
 
 namespace App\Service\Licence\Dto;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\State\CardCollectionProvider;
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/licence/{slug}/extensions/{setId}/cards',
+            provider: CardCollectionProvider::class
+        ),
+    ],
+)]
 final readonly class Card
 {
     /**

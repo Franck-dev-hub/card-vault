@@ -10,5 +10,6 @@ final readonly class Extension
         public string $id,
         public string $name,
         public ?int $totalCards = null,
-    ) {}
+    ) {
+    }
 }

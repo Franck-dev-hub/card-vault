@@ -6,5 +6,4 @@ namespace App\Service\Licence;
 
 final class LicenceNotFoundException extends LicenceClientException
 {
-
 }

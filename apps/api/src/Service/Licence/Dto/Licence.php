@@ -9,5 +9,6 @@ final readonly class Licence
     public function __construct(
         public string $slug,
         public string $name,
-    ) {}
+    ) {
+    }
 }

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Service\Licence\Dto;
 
-use App\Service\Licence\Dto\PriceSet;
-
 final readonly class Card
 {
     /**
-     * @param string[] $variant
-     * @param array<string, PriceSet> $prices clé = "normal"|"holo"|"foil"...
+     * @param string[]                $variant
+     * @param array<string, PriceSet> $prices
      */
     public function __construct(
         public string $licence,
@@ -21,8 +19,9 @@ final readonly class Card
         public string $extensionName,
         public ?string $illustrator,
         public ?string $rarity,
-        public string $cardImage,
+        public ?string $cardImage,
         public array $variant,
         public array $prices,
-    ) {}
+    ) {
+    }
 }

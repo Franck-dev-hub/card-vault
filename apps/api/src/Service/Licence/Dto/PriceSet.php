@@ -10,5 +10,6 @@ final readonly class PriceSet
         public float $avg = 0.0,
         public float $low = 0.0,
         public float $trend = 0.0,
-    ) {}
+    ) {
+    }
 }

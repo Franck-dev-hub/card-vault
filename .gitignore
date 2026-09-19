@@ -39,3 +39,4 @@ playwright-report/
 .remember/
 AGENTS.md
 CLAUDE.md
+/docs/agents/

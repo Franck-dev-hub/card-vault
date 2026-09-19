@@ -3,13 +3,7 @@
 Product roadmap derived from the V1 scope: the V1.0 MVP defines what is in
 scope, and each later minor version is a future improvement.
 
-## Released
-
-N/A
-
-## In progress
-
-N/A
+Nothing released yet.
 
 ## Planned
 

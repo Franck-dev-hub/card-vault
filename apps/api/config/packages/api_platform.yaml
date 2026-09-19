@@ -1,7 +1,14 @@
 api_platform:
     title: Hello API Platform
     version: 1.0.0
+    enable_scalar: false
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+    exception_to_status:
+        App\Service\Licence\LicenceNotFoundException: 404
+        App\Service\Licence\UpstreamNotAvailableException: 502

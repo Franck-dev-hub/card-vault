@@ -1,30 +1,32 @@
 # Backend architecture
 
 API Platform exposes the API. The interactive OpenAPI documentation is the
-canonical reference: `http://card-vault.localhost/api/docs` in dev. The table
-below is a summary; any change to the endpoints must keep one row here.
+canonical reference: `http://card-vault.localhost/api/docs` in dev.
 
-## Endpoints (API Platform)
+## Endpoints
 
-| Method | Path                                         | Auth | Purpose                          |
-|--------|----------------------------------------------|------|----------------------------------|
-| POST   | /api/register                                | No   | Create an account                |
-| POST   | /api/login                                   | No   | Start a session                  |
-| POST   | /api/logout                                  | Yes  | Destroy the session              |
-| GET    | /api/me                                      | Yes  | Get the connected user           |
-| GET    | /api/license                                 | No   | List license                     |
-| GET    | /api/license/{slug}/extensions               | No   | List a game's extensions         |
-| GET    | /api/license/{slug}/extensions/{setId}/cards | No   | List an extension's cards        |
-| GET    | /api/license/{slug}/cards/{cardId}           | No   | Get a single card                |
-| GET    | /api/vault                                   | Yes  | List collection items            |
-| POST   | /api/vault                                   | Yes  | Add a collection item            |
-| PATCH  | /api/vault/{id}                              | Yes  | Update a collection item         |
-| DELETE | /api/vault/{id}                              | Yes  | Remove a collection item         |
-| GET    | /api/vault/stats                             | Yes  | Collection statistics            |
-| GET    | /api/vault/recent                            | Yes  | Recently added items             |
-| GET    | /api/dashboard                               | Yes  | Dashboard data                   |
-| POST   | /api/scan                                    | Yes  | Proxy an image to the ML service |
-| GET    | /api/health                                  | No   | Liveness check                   |
+`Live` means the route answers today. Any endpoint added or implemented must
+flip its row here in the same PR.
+
+| Method | Path                                         | Auth | Status  | Purpose                          |
+|--------|----------------------------------------------|------|---------|----------------------------------|
+| GET    | /health                                      | No   | Live    | Liveness check                   |
+| GET    | /api/licence                                 | No   | Live    | List licences                    |
+| GET    | /api/licence/{slug}/extensions               | No   | Live    | List a game's extensions         |
+| GET    | /api/licence/{slug}/extensions/{setId}/cards | No   | Live    | List an extension's cards        |
+| GET    | /api/licence/{slug}/cards/{cardId}           | No   | Live    | Get a single card                |
+| POST   | /api/register                                | No   | Planned | Create an account                |
+| POST   | /api/login                                   | No   | Planned | Start a session                  |
+| POST   | /api/logout                                  | Yes  | Planned | Destroy the session              |
+| GET    | /api/me                                      | Yes  | Planned | Get the connected user           |
+| GET    | /api/vault                                   | Yes  | Planned | List collection items            |
+| POST   | /api/vault                                   | Yes  | Planned | Add a collection item            |
+| PATCH  | /api/vault/{id}                              | Yes  | Planned | Update a collection item         |
+| DELETE | /api/vault/{id}                              | Yes  | Planned | Remove a collection item         |
+| GET    | /api/vault/stats                             | Yes  | Planned | Collection statistics            |
+| GET    | /api/vault/recent                            | Yes  | Planned | Recently added items             |
+| GET    | /api/dashboard                               | Yes  | Planned | Dashboard data                   |
+| POST   | /api/scan                                    | Yes  | Planned | Proxy an image to the ML service |
 
 ## Structure and organisation
 

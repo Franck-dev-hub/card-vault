@@ -9,7 +9,6 @@ use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonySetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->importNames();
     $rectorConfig->removeUnusedImports();
 
     $rectorConfig->paths([

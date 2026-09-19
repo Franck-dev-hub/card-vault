@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import faiss
 import requests
@@ -17,7 +18,7 @@ MODEL_NAME = "facebook/dinov2-small"
 HF_DATASET_ID = "Franck-dev/CardVault"
 DATA_DIR = BASE_DIR / "data_cache"
 INDEX_FILE = DATA_DIR / "cards_index.faiss"
-NAMES_FILE = DATA_DIR / "cards_metadata.npy"
+NAMES_FILE = DATA_DIR / "cards_metadata.json"
 BATCH_SIZE = 128
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
@@ -42,7 +43,7 @@ def build_index():
         )
         hf_hub_download(  # nosec B615
             repo_id=HF_DATASET_ID,
-            filename="cards_metadata.npy",
+            filename="cards_metadata.json",
             repo_type="dataset",
             local_dir=str(DATA_DIR),
         )
@@ -95,7 +96,21 @@ def build_index():
     print(f"\nSaving index in : {DATA_DIR}")
     os.makedirs(str(DATA_DIR), exist_ok=True)
     faiss.write_index(index, str(INDEX_FILE))
-    np.save(str(NAMES_FILE), np.array(metadata, dtype=object))
+    with open(str(NAMES_FILE), "w", encoding="utf-8") as f:
+        json.dump(metadata, f)
+
+
+def _load_metadata() -> list:
+    with open(str(NAMES_FILE), encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError("cards_metadata.json must contain a JSON array")
+    for entry in data:
+        if not isinstance(entry, dict) or not isinstance(
+            entry.get("id"), str
+        ):
+            raise ValueError("cards_metadata.json entry missing string id")
+    return data
 
 
 def search_card(image_bytes: bytes):
@@ -108,14 +123,14 @@ def search_card(image_bytes: bytes):
 
         # Load index and names
         index = faiss.read_index(str(INDEX_FILE))
-        metadata = np.load(str(NAMES_FILE), allow_pickle=True)
+        metadata = _load_metadata()
 
         if index.ntotal == 0 or len(metadata) == 0:
             print("Empty index detected locally. Rebuilding...")
             build_index()
             # Reload after rebuild
             index = faiss.read_index(str(INDEX_FILE))
-            metadata = np.load(str(NAMES_FILE), allow_pickle=True)
+            metadata = _load_metadata()
 
         # Prepare image to test
         query_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")

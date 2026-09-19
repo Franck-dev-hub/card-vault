@@ -1,6 +1,16 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.predict import router as predict_router
+from app.models.model import warm_up
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    warm_up()
+    yield
 
 
 def create_app() -> FastAPI:
@@ -10,6 +20,7 @@ def create_app() -> FastAPI:
         version="1.0.0",
         docs_url="/api/v1/docs",
         redoc_url=None,
+        lifespan=lifespan,
     )
 
     app.add_middleware(

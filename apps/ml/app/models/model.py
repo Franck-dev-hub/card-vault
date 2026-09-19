@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import threading
 import faiss
 import requests
 import torch
@@ -113,24 +114,46 @@ def _load_metadata() -> list:
     return data
 
 
-def search_card(image_bytes: bytes):
-    try:
-        # If index doesn't exist, we build it
-        if not os.path.exists(str(INDEX_FILE)) or not os.path.exists(
-            str(NAMES_FILE)
-        ):
+_index: faiss.Index | None = None
+_metadata: list | None = None
+_index_lock = threading.Lock()
+
+
+def _ensure_index() -> tuple[faiss.Index, list]:
+    global _index, _metadata
+
+    if _index is not None and _metadata is not None:
+        return _index, _metadata
+
+    with _index_lock:
+        if _index is not None and _metadata is not None:
+            return _index, _metadata
+
+        if not INDEX_FILE.exists() or not NAMES_FILE.exists():
             build_index()
 
-        # Load index and names
         index = faiss.read_index(str(INDEX_FILE))
         metadata = _load_metadata()
 
         if index.ntotal == 0 or len(metadata) == 0:
             print("Empty index detected locally. Rebuilding...")
             build_index()
-            # Reload after rebuild
             index = faiss.read_index(str(INDEX_FILE))
             metadata = _load_metadata()
+
+        _index, _metadata = index, metadata
+
+        return index, metadata
+
+
+def warm_up() -> None:
+    if INDEX_FILE.exists() and NAMES_FILE.exists():
+        _ensure_index()
+
+
+def search_card(image_bytes: bytes):
+    try:
+        index, metadata = _ensure_index()
 
         # Prepare image to test
         query_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")

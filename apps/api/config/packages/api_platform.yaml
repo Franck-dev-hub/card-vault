@@ -1,6 +1,7 @@
 api_platform:
     title: Hello API Platform
     version: 1.0.0
+    enable_scalar: false
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']

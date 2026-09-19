@@ -8,7 +8,6 @@ import torch
 import numpy as np
 from pathlib import Path
 from PIL import Image
-from fastapi import HTTPException
 from transformers import AutoImageProcessor, AutoModel
 from datasets import load_dataset
 from huggingface_hub import hf_hub_download
@@ -21,7 +20,7 @@ DATA_DIR = BASE_DIR / "data_cache"
 INDEX_FILE = DATA_DIR / "cards_index.faiss"
 NAMES_FILE = DATA_DIR / "cards_metadata.json"
 BATCH_SIZE = 128
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://api:8000")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -151,58 +150,45 @@ def warm_up() -> None:
         _ensure_index()
 
 
-def search_card(image_bytes: bytes):
-    try:
-        index, metadata = _ensure_index()
+def search_card(image_bytes: bytes) -> list:
+    index, metadata = _ensure_index()
 
-        # Prepare image to test
-        query_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        inputs = processor(images=query_img, return_tensors="pt").to(device)
+    query_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    inputs = processor(images=query_img, return_tensors="pt").to(device)
 
-        with torch.no_grad():
-            outputs = model(**inputs)
-            query_emb = outputs.last_hidden_state[:, 0, :].cpu().numpy()
+    with torch.no_grad():
+        outputs = model(**inputs)
+        query_emb = outputs.last_hidden_state[:, 0, :].cpu().numpy()
 
-        faiss.normalize_L2(query_emb)
+    faiss.normalize_L2(query_emb)
 
-        # Get 3 best matches
-        scores, indices = index.search(query_emb, 3)
-        results = []
+    # Get 3 best matches
+    scores, indices = index.search(query_emb, 3)
+    results = []
 
-        for i in range(3):
-            idx = indices[0][i]
-            if idx == -1:
-                print(f"#{i + 1} : No match found.")
-                continue
-            score = scores[0][i]
-            card_id = metadata[idx]["id"]
+    for i in range(3):
+        idx = indices[0][i]
+        if idx == -1:
+            continue
 
-            formatted_id = card_id.replace("-", "/")
-            url = f"http://backend:8000/api/search/pokemon/{formatted_id}"
-            try:
-                response = requests.get(url, timeout=2.0)
-                response.raise_for_status()
-                api_data = response.json()
+        score = scores[0][i]
+        card_id = metadata[idx]["id"]
+        url = f"{BACKEND_URL}/api/licence/pokemon/cards/pokemon-{card_id}"
 
-                results.append(
-                    {"score": round(float(score), 4), "data": api_data}
-                )
+        try:
+            response = requests.get(url, timeout=2.0)
+            response.raise_for_status()
+            results.append(
+                {"score": round(float(score), 4), "data": response.json()}
+            )
+        except requests.exceptions.RequestException as e:
+            print(f"API error for ID {card_id}: {e}")
+            results.append(
+                {
+                    "score": round(float(score), 4),
+                    "card_id": card_id,
+                    "error": "API Unreachable",
+                }
+            )
 
-            except requests.exceptions.RequestException as e:
-                print(f"API error for ID {card_id}: {e}")
-                results.append(
-                    {
-                        "score": float(score),
-                        "card_id": card_id,
-                        "error": "API Unreachable",
-                    }
-                )
-
-        return results
-
-    except Exception as e:
-        print(f"Search error: {type(e).__name__}: {e}")
-        import traceback
-
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+    return results

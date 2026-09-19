@@ -13,8 +13,6 @@ final class LicenceClientRegistryTest extends KernelTestCase
 {
     public function testKnownSlugResolvesToTheTaggedClient(): void
     {
-        $this->markTestSkipped('LicenceClientRegistry has no consumer yet (see #6 step 6).');
-
         self::bootKernel();
 
         $registry = self::getContainer()->get(LicenceClientRegistry::class);
@@ -24,8 +22,6 @@ final class LicenceClientRegistryTest extends KernelTestCase
 
     public function testUnknownSlugThrows(): void
     {
-        $this->markTestSkipped('LicenceClientRegistry has no consumer yet (see #6 step 6).');
-
         self::bootKernel();
 
         $registry = self::getContainer()->get(LicenceClientRegistry::class);

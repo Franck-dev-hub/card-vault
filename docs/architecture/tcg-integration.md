@@ -1,26 +1,18 @@
 # Add a card game (licence)
 
-Card Vault supports several card games ("licences"). Each one plugs a
-third-party card database into the unified API. Card data is fetched live, no
-catalogue is stored in the database.
-
-## How a licence is wired
+Card data is fetched live from third-party databases, nothing is stored.
 
 ```
-HTTP request
-  → API Platform operation (#[ApiResource] on the DTO)
-  → State provider (src/State/)
-  → LicenceClientRegistry::get($slug)
-  → {Licence}Client  → upstream API
-  → {Licence}Normaliser → DTO
+request → API Platform operation (#[ApiResource] on the DTO)
+        → state provider (src/State/)
+        → LicenceClientRegistry::get($slug)
+        → {Licence}Client → upstream → {Licence}Normaliser → DTO
 ```
 
-Clients are tagged with `app.licence_client` and resolved by slug through a
-service locator. Adding a licence therefore requires **no change to the
-providers, the registry or any dispatch table**: only the new client declares
-itself, through its tag.
+Clients declare themselves through a tag, so adding a licence touches no
+provider, no registry and no routing.
 
-## Endpoint contract
+## Endpoints
 
 | Endpoint                                           | Returns                    |
 |----------------------------------------------------|----------------------------|
@@ -29,63 +21,31 @@ itself, through its tag.
 | `GET /api/licence/{slug}/extensions/{setId}/cards` | Cards of an extension      |
 | `GET /api/licence/{slug}/cards/{cardId}`           | A single card              |
 
-Responses are JSON-LD by default; plain JSON is available through content
-negotiation.
+JSON-LD by default, plain JSON through content negotiation.
 
-## Client contract
-
-Every licence implements `LicenceClientInterface`:
-
-```php
-public function listExtensions(): array;               // Extension[]
-public function listCards(string $extensionId): array; // Card[]
-public function getCard(string $cardId): Card;
-```
-
-`getCard()` takes no extension id: upstream card ids are self-sufficient on
-both TCGdex (`swsh3-136` encodes the set) and Scryfall (UUID lookup).
-
-## DTO shapes
+## DTOs
 
 Plain readonly classes in `apps/api/src/Service/Licence/Dto/`, no Doctrine
-mapping. Keep the shape identical across licences so the frontend never
-branches on the source game.
+mapping, identical across licences so the frontend never branches on the game.
 
-**`Licence`**: `slug`, `name`. Static list, read from
-`apps/api/resources/licences.json`.
+| DTO         | Fields                                                                                                                                                                                             |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Licence`   | `slug`, `name`, read from `apps/api/resources/licences.json`                                                                                                                                       |
+| `Extension` | `id` (the upstream set code), `name`, `totalCards`                                                                                                                                                 |
+| `Card`      | `licence`, `cardId`, `cardNumber`, `cardName`, `extensionId`, `extensionName`, `illustrator`, `rarity`, `cardImage`, `variant` (`string[]`), `prices` (`array<string, PriceSet>` keyed by variant) |
+| `PriceSet`  | `avg`, `low`, `trend`, in EUR                                                                                                                                                                      |
 
-**`Extension`**: `id`, `name`, `totalCards` (nullable).
+`cardId` is prefixed (`pokemon-base1-1`, `magic-{uuid}`) to stay unique across
+licences. The single card route accepts that form and strips the prefix before
+calling upstream, so a `cardId` read from a list is usable as is.
 
-**`Card`**:
+Extensions have no single-item route, so they carry anonymous `genid` IRIs.
 
-| Field           | Type                      | Notes                                                     |
-|-----------------|---------------------------|-----------------------------------------------------------|
-| `licence`       | `string`                  | the slug                                                  |
-| `cardId`        | `string`                  | prefixed by licence: `pokemon-base1-1`, `magic-{uuid}`    |
-| `cardNumber`    | `string`                  | number printed on the card                                |
-| `cardName`      | `string`                  |                                                           |
-| `extensionId`   | `string`                  | comes from the set, never from the card id                |
-| `extensionName` | `string`                  |                                                           |
-| `illustrator`   | `?string`                 |                                                           |
-| `rarity`        | `?string`                 |                                                           |
-| `cardImage`     | `?string`                 |                                                           |
-| `variant`       | `string[]`                | names of the variants the card exists in                  |
-| `prices`        | `array<string, PriceSet>` | keyed by variant name, empty when the source exposes none |
+A `PriceSet` exists only when the source has a price, hence `avg` is always
+set. `low` and `trend` are `null` when the source does not track them at all
+(Scryfall) and `0.0` when it does but has no value for that card (Cardmarket).
 
-**`PriceSet`**: `avg`, `low`, `trend`, floats in EUR, `0.0` when the source
-knows the variant but not its price. USD is out of scope, see #53.
-
-## Identifiers and links
-
-`cardId` is the public identifier and is prefixed to stay unique across
-licences. The single card route accepts that prefixed form and strips the
-prefix before calling upstream, so a `cardId` read from a list can be used
-as-is.
-
-Extensions are not addressable individually: no such endpoint exists, so they
-carry anonymous `genid` IRIs instead of real URLs.
-
-## Error contract
+## Errors
 
 | Situation                       | Exception                       | HTTP |
 |---------------------------------|---------------------------------|------|
@@ -93,56 +53,55 @@ carry anonymous `genid` IRIs instead of real URLs.
 | Upstream 5xx or network failure | `UpstreamNotAvailableException` | 502  |
 
 Mapped in `config/packages/api_platform.yaml` under `exception_to_status`.
+Detection depends on the transport:
 
-Upstream outages are detected by `UpstreamAwareHttpClient`, a PSR-18
-decorator. It converts 5xx responses and transport failures into
-`UpstreamNotAvailableException`, and lets 4xx through untouched so a missing
-card stays a 404. Every licence must wrap its HTTP client in it.
+- Symfony `HttpClientInterface`: `toArray()` throws already, catch
+  `ClientExceptionInterface` (4xx) then `ExceptionInterface` (the rest).
+- An SDK that swallows status codes (TCGdex): wrap its PSR-18 client in
+  `UpstreamAwareHttpClient`.
 
-## Steps to add a licence
+Beware the homonym: Symfony's `ClientExceptionInterface` means 4xx, the PSR-18
+one means any client failure.
 
-1. Create `apps/api/src/Service/Licence/{Licence}/` with a client implementing
-   `LicenceClientInterface` and a normaliser turning upstream payloads into the
-   DTOs above.
-2. Tag the client:
+## Adding a licence
+
+Implement `LicenceClientInterface`:
+
+```php
+public function listExtensions(): array;               // Extension[]
+public function listCards(string $extensionId): array; // Card[]
+public function getCard(string $cardId): Card;         // upstream ids are self-sufficient
+```
+
+1. Create `src/Service/Licence/{Licence}/` with a client and a normaliser.
+2. Tag the client with
    `#[AutoconfigureTag('app.licence_client', ['slug' => '{slug}'])]`.
-3. Wrap the HTTP client in `UpstreamAwareHttpClient`. If the upstream ships an
-   SDK needing setup before injection, add a factory next to the client and
-   register it in `config/services.yaml` (see `TcgdexFactory`).
+3. Surface outages as `UpstreamNotAvailableException`, see above. Declare a
+   scoped client under `framework.http_client.scoped_clients` for a plain HTTP
+   source (`scryfall.client`, injected as `$scryfallClient`), or a factory for
+   an SDK (`TcgdexFactory`).
 4. Add the licence to `apps/api/resources/licences.json`.
-5. Update the [frontend licence filter](frontend.md) if it hardcodes games, and
-   the supported-games table in the [user guide](../user-guide/usage.md).
+5. Update the [frontend filter](frontend.md) and the supported-games table in
+   the [user guide](../user-guide/usage.md).
 
-Nothing else: routes, serialisation and OpenAPI documentation come from the
-shared providers.
+Routes, serialisation and OpenAPI documentation come from the shared providers.
 
-## Upstream notes
+Test the normaliser against a payload captured upstream, and the client with
+`MockHttpClient`: nominal case, upstream 404, upstream 5xx. See the
+[testing conventions](../contributing/guidelines.md).
 
-| Licence | Source                | Client                                     |
-|---------|-----------------------|--------------------------------------------|
-| Pokémon | TCGdex v2, no API key | official `tcgdex/sdk` package              |
-| Magic   | Scryfall, no API key  | hand-rolled, Scryfall publishes no PHP SDK |
+## Sources
 
-The v1 project (`card_vault_v1`, a separate Python/FastAPI codebase) holds the
-same two integrations. Useful only to read upstream payload shapes, not as a
-template: different language, no shared interface, and known bugs.
-
-## Tests
-
-- Unit test the normaliser against a payload captured from the real upstream.
-- Unit test the client with `MockHttpClient`: nominal case, unknown card
-  (upstream 404 gives `LicenceNotFoundException`), outage (upstream 5xx gives
-  `UpstreamNotAvailableException`).
-- Unit test the registry: known slug, unknown slug.
-- Smoke test the live upstream by hand before opening a PR.
-
-See [testing conventions](../contributing/guidelines.md).
+| Licence | Source            | Client                | Cost of one set                            |
+|---------|-------------------|-----------------------|--------------------------------------------|
+| Pokémon | TCGdex v2, no key | `tcgdex/sdk`          | one call per card                          |
+| Magic   | Scryfall, no key  | Symfony scoped client | one call per 175 cards, follow `next_page` |
 
 ## Known limitations
 
 | Limitation                                                 | Ticket               |
 |------------------------------------------------------------|----------------------|
-| `listCards()` makes one upstream call per card             | #29, catalogue cache |
-| Magic double-faced cards expose the first face only        | #54                  |
+| `listCards()` costs one call per card on Pokémon           | #29, catalogue cache |
+| Magic double-faced cards expose the front face only        | #54                  |
 | Prices are EUR only                                        | #53                  |
 | Scryfall calls send no User-Agent and are not rate-limited | #52                  |

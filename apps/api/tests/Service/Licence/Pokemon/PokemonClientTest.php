@@ -51,6 +51,50 @@ final class PokemonClientTest extends TestCase
         self::assertSame(201, $extensions[1]->totalCards);
     }
 
+    /**
+     * Listing cards costs one call for the set, then one per card, because the set
+     * endpoint only returns partial cards and the DTO must stay complete.
+     */
+    #[IgnoreDeprecations]
+    public function testListCardsFetchesEveryCardOfTheSet(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse(json_encode([
+                'id' => 'base1',
+                'name' => 'Base Set',
+                'cardCount' => ['total' => 1, 'official' => 1],
+                'cards' => [
+                    ['id' => 'base1-1', 'localId' => '1', 'name' => 'Alakazam', 'image' => null],
+                ],
+            ], JSON_THROW_ON_ERROR)),
+            new MockResponse(json_encode([
+                'id' => 'base1-1',
+                'localId' => '1',
+                'name' => 'Alakazam',
+                'image' => 'https://assets.tcgdex.net/en/base/base1/1',
+                'illustrator' => 'Ken Sugimori',
+                'rarity' => 'Rare Holo',
+                'set' => ['id' => 'base1', 'name' => 'Base Set'],
+                'variants' => [
+                    'normal' => false,
+                    'reverse' => false,
+                    'holo' => true,
+                    'firstEdition' => true,
+                    'wPromo' => false,
+                ],
+            ], JSON_THROW_ON_ERROR)),
+        ]);
+
+        $cards = $this->buildClient($httpClient)->listCards('base1');
+
+        self::assertCount(1, $cards);
+        self::assertSame('pokemon-base1-1', $cards[0]->cardId);
+        self::assertSame('Alakazam', $cards[0]->cardName);
+        self::assertSame('base1', $cards[0]->extensionId);
+        self::assertSame('Ken Sugimori', $cards[0]->illustrator);
+        self::assertSame(['holo', 'firstEdition'], $cards[0]->variant);
+    }
+
     public function testListCardsThrowsWhenExtensionIsUnknown(): void
     {
         $httpClient = new MockHttpClient([

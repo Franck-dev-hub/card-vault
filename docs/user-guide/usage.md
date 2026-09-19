@@ -3,8 +3,8 @@
 Card Vault centralises collections from multiple trading card games in a
 single virtual vault.
 
-Some features below are still planned and do not exist yet. See the
-[roadmap](../contributing/roadmap.md) for the status of each version.
+The web interface does not exist yet, so the flows below describe the target
+experience. See the [roadmap](../contributing/roadmap.md) for what lands when.
 
 ## Add a card by searching (planned)
 
@@ -31,9 +31,10 @@ Scanning currently supports Pokémon cards.
 
 ## Games supported
 
-| Game                | Search | Scan |
-|---------------------|--------|------|
-| Pokémon             | Yes    | Yes  |
-| Magic the Gathering | Yes    | No   |
 
-Other games are planned: See the [roadmap](../contributing/roadmap.md)
+| Game                | API | Scan    |
+|---------------------|-----|---------|
+| Pokémon             | Yes | Live    |
+| Magic the Gathering | Yes | Planned |
+
+Other games are planned, see the [roadmap](../contributing/roadmap.md).

@@ -7,6 +7,8 @@ namespace App\Tests\Service\Licence\Pokemon;
 use App\Service\Licence\LicenceNotFoundException;
 use App\Service\Licence\Pokemon\PokemonClient;
 use App\Service\Licence\Pokemon\PokemonNormaliser;
+use App\Service\Licence\UpstreamAwareHttpClient;
+use App\Service\Licence\UpstreamNotAvailableException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +26,7 @@ final class PokemonClientTest extends TestCase
         $psr17Factory = new Psr17Factory();
         TCGdex::$requestFactory = $psr17Factory;
         TCGdex::$responseFactory = $psr17Factory;
-        TCGdex::$client = new Psr18Client($httpClient);
+        TCGdex::$client = new UpstreamAwareHttpClient(new Psr18Client($httpClient), 'pokemon');
         TCGdex::$cache = new Psr16Cache(new ArrayAdapter());
 
         $sdk = new TCGdex('en');
@@ -98,5 +100,16 @@ final class PokemonClientTest extends TestCase
         $this->expectException(LicenceNotFoundException::class);
 
         $this->buildClient($httpClient)->getCard('does-not-exist');
+    }
+
+    public function testUpstreamFailureIsNotReportedAsAMissingCard(): void
+    {
+        $httpClient = new MockHttpClient([
+            new MockResponse('', ['http_code' => 503]),
+        ]);
+
+        $this->expectException(UpstreamNotAvailableException::class);
+
+        $this->buildClient($httpClient)->getCard('swsh3-136');
     }
 }

@@ -8,8 +8,8 @@ final readonly class PriceSet
 {
     public function __construct(
         public float $avg = 0.0,
-        public float $low = 0.0,
-        public float $trend = 0.0,
+        public ?float $low = null,
+        public ?float $trend = null,
     ) {
     }
 }

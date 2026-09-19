@@ -1,12 +1,13 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-
-    # Note that the session will be started ONLY if you read or write from it.
     session: true
-
-    #esi: true
-    #fragments: true
+    http_client:
+        scoped_clients:
+            scryfall.client:
+                base_uri: 'https://api.scryfall.com/'
+                headers:
+                    Accept: 'application/json'
 
 when@test:
     framework:

@@ -20,8 +20,8 @@ use App\State\CardItemProvider;
         new Get(
             uriTemplate: '/licence/{slug}/cards/{cardId}',
             uriVariables: [
-                'slug' => new Link(fromClass: Card::class, identifiers: ['licence'], parameterName: 'slug'),
-                'cardId' => new Link(fromClass: Card::class, identifiers: ['cardId'], parameterName: 'cardId'),
+                'slug' => new Link(parameterName: 'slug', fromClass: Card::class, identifiers: ['licence']),
+                'cardId' => new Link(parameterName: 'cardId', fromClass: Card::class, identifiers: ['cardId']),
             ],
             provider: CardItemProvider::class
         ),

@@ -9,7 +9,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-final class UpstreamAwareHttpClient implements ClientInterface
+final readonly class UpstreamAwareHttpClient implements ClientInterface
 {
     public function __construct(
         private ClientInterface $decorated,

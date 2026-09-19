@@ -82,7 +82,7 @@ final class PokemonClientTest extends TestCase
             ], JSON_THROW_ON_ERROR)),
         ]);
 
-        $card = $this->buildClient($httpClient)->getCard('swsh3', 'swsh3-136');
+        $card = $this->buildClient($httpClient)->getCard('swsh3-136');
 
         self::assertSame('pokemon-swsh3-136', $card->cardId);
         self::assertSame('Furret', $card->cardName);
@@ -97,6 +97,6 @@ final class PokemonClientTest extends TestCase
 
         $this->expectException(LicenceNotFoundException::class);
 
-        $this->buildClient($httpClient)->getCard('swsh3', 'does-not-exist');
+        $this->buildClient($httpClient)->getCard('does-not-exist');
     }
 }

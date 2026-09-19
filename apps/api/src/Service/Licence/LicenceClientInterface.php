@@ -15,5 +15,5 @@ interface LicenceClientInterface
     /** @return Card[] */
     public function listCards(string $extensionId): array;
 
-    public function getCard(string $extensionId, string $cardId): Card;
+    public function getCard(string $cardId): Card;
 }

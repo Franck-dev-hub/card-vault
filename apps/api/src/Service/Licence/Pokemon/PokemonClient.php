@@ -48,7 +48,7 @@ final readonly class PokemonClient implements LicenceClientInterface
         );
     }
 
-    public function getCard(string $extensionId, string $cardId): Card
+    public function getCard(string $cardId): Card
     {
         $card = $this->tcgdex->card->get($cardId);
 

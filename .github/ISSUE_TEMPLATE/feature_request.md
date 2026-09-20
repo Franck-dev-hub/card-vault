@@ -1,20 +1,24 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
+about: Propose a feature or an improvement
+title: '[Feature] '
 labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Context**
+Why this ticket exists. The problem, not the solution.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**User story** (optional, when the ticket changes what someone can do)
+As a [role], I want [capability], so that [outcome].
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Scope**
+In: what this ticket covers.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Out of scope** (optional, when ambiguity is likely)
+What it explicitly excludes.
+
+**Acceptance Criteria**
+- [ ] Binary, verifiable condition
+- [ ] Another one, with no unquantified adjective ("faster" without a number)

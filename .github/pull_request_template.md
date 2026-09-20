@@ -1,7 +1,7 @@
 ## Description
 
 ## Type
-Feature, Fix, Refactor, Docs, Tests, Other
+Feature, Chore, Fix, Hotfix, Refactor, Doc, Test, Style, Release, WIP
 
 ## Related issues
 

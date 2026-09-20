@@ -33,12 +33,22 @@ secret overrides are managed by the maintainer.
 | `REDIS_VERSION`                                       | Redis image tag                                              |
 | `CADDY_VERSION`                                       | Caddy image tag                                              |
 | `PHP_EXTENSIONS`                                      | PHP extensions installed at build time                       |
-| `SESSION_LIFETIME`                                    | Session cookie lifetime in seconds                           |
+| `SESSION_LIFETIME`                                    | Server-side session lifetime, also the Redis key TTL         |
+| `REDIS_CACHE_MAXMEMORY`                               | Memory cap of the cache instance, `allkeys-lru` eviction     |
+| `REDIS_SESSION_MAXMEMORY`                             | Memory cap of the session instance, `noeviction`             |
 | `APP_SECRET`                                          | Symfony app secret (random value, required)                  |
 | `XDEBUG_MODE`                                         | Dev only, e.g. `debug`                                       |
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | Database credentials                                         |
 | `PGADMIN_PASSWORD`                                    | pgAdmin password (dev)                                       |
 | `HF_TOKEN`                                            | Hugging Face token, required to download models on first run |
+
+The API also reads two DSNs, injected by the compose files and defaulted in
+`apps/api/.env` so that PHPUnit resolves them without Docker:
+
+| Variable            | Description                                |
+|---------------------|--------------------------------------------|
+| `REDIS_CACHE_URL`   | Cache instance, backs the `cache.api` pool |
+| `REDIS_SESSION_URL` | Session instance, backs the session handler |
 
 ## Secrets
 

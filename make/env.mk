@@ -59,7 +59,8 @@ define display-urls
 		echo "  RedisInsight:  http://localhost:5540"; \
 		echo "  Mailpit:       http://localhost:8025"; \
 		echo "  Postgres:      postgresql://localhost:5432"; \
-		echo "  Redis:         redis://localhost:6379"; \
+		echo "  Redis cache:   redis://localhost:6379"; \
+		echo "  Redis session: redis://localhost:6380"; \
 	elif [ "$(1)" = "preprod" ] || [ "$(1)" = "prod" ]; then \
 		domain=$$(grep '^PROJECT_DOMAIN=' .env.$(1) | cut -d= -f2); \
 		echo "Services:"; \

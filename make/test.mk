@@ -2,7 +2,7 @@
 
 # === TESTS ===
 test/backend:
-	$(DC_CI) up -d database redis
+	$(DC_CI) up -d database
 	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && php bin/phpunit"
 
 test/frontend:
@@ -16,7 +16,7 @@ test/e2e:
 	$(DC_CI) --profile e2e run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 playwright sh -c "corepack pnpm install && corepack pnpm run test:e2e"
 
 test/infection:
-	$(DC_CI) up -d database redis
+	$(DC_CI) up -d database
 	$(DC_CI) run --rm php sh -c "composer install --no-interaction --prefer-dist && vendor/bin/infection"
 
 test: test/backend test/frontend test/ml test/e2e test/infection

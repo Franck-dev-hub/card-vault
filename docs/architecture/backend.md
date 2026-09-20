@@ -44,6 +44,21 @@ Not implemented yet. The intended model is session-cookie authentication
 (`SESSION_LIFETIME` is already configured in the environment), no JWT.
 Permissions planned via Symfony Voters.
 
+## Cache and sessions
+
+| Instance        | Holds                                           | Persistence | Memory policy |
+|-----------------|-------------------------------------------------|-------------|---------------|
+| `redis-cache`   | `cache.api` pool, Doctrine result cache in prod | none        | `allkeys-lru` |
+| `redis-session` | PHP sessions                                    | AOF         | `noeviction`  |
+
+Two instances, not one with two databases: `maxmemory` is a property of the
+process, so a single instance cannot both evict cache entries under pressure and
+never evict sessions.
+
+Inject the pool as `CacheInterface $cacheApi`, default lifetime 7 days. Clear it
+with `cache:pool:clear cache.api`; in `prod` that also clears the Doctrine result
+cache. Sessions live in the other instance and survive even a `FLUSHDB`.
+
 ## Database
 
 PostgreSQL (already wired in `docker/compose.yaml`), migrations with

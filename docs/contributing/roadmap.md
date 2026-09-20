@@ -3,9 +3,32 @@
 Product roadmap derived from the V1 scope: the V1.0 MVP defines what is in
 scope, and each later minor version is a future improvement.
 
-Nothing released yet.
+Released so far: `v0.1`, `v0.2`. Both tag `develop`, nothing is deployed yet.
+
+## Path to V1.0
+
+V1.0 is the first public release on prod. Everything before it ships to preprod.
+
+Each milestone is dependency-closed: no ticket in one depends on a ticket in a
+later one, so they can be taken in order. The next thing to work on is always
+the lowest milestone still holding open tickets.
+
+| Milestone | Delivers                                                    | Target  |
+|-----------|-------------------------------------------------------------|---------|
+| V0.1      | Backend foundation: Doctrine, migrations, API Platform      | done    |
+| V0.2      | Catalogue read path, split Redis, non-blocking ML           | done    |
+| V0.2.1    | ML closed to the public, dead CORS removed, CI guards       | preprod |
+| V0.3      | Register, log in, log out                                    | preprod |
+| V0.4      | Browse licence, extension, card and its detail               | preprod |
+| V0.5      | Add and remove cards from the vault                          | preprod |
+| V0.6      | Scan a card with the camera                                  | preprod |
+| V0.7      | E2E, backups, rate limiting, legal pages, consent            | preprod |
+| V1.0      | Public launch                                                | prod    |
 
 ## Planned
+
+Product scope only. Infrastructure, observability and compliance tickets carry
+the same milestones without appearing here.
 
 ### V1.0
 #### Account

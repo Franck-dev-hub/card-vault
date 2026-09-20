@@ -15,9 +15,9 @@ The ML service needs `HF_TOKEN` on first run. Fill it in `.env.local`
 
 ### Ports already in use
 
-The dev stack exposes ports 80, 5432, 6379, 5050, 5540, 8025, 1025. If one is
-taken, stop the conflicting service or change the host port in
-`docker/compose.dev.yaml`.
+The dev stack exposes ports 80, 5432, 6379 (redis-cache), 6380 (redis-session),
+5050, 5540, 8025, 1025. If one is taken, stop the conflicting service or change
+the host port in `docker/compose.dev.yaml`.
 
 ## Inside the app
 

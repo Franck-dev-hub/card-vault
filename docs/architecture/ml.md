@@ -13,13 +13,11 @@ exposed to the browser.
 
 ## Training vs inference
 
-Not implemented yet.
-
-- Training: dataset of card images, offline pipeline, produces the FAISS
-  index.
-- Inference: the DINOv2 model and FAISS index are loaded once at startup and
-  kept in memory. Handlers are `def` (FastAPI threadpool), never blocking async
-  handlers for CPU-bound inference.
+- Training: not implemented yet. Dataset of card images, offline pipeline,
+  produces the FAISS index.
+- Inference: live. The DINOv2 model and FAISS index are loaded once at startup
+  and kept in memory. Handlers are `def` (FastAPI threadpool), never blocking
+  async handlers for CPU-bound inference.
 
 ## Dependencies
 

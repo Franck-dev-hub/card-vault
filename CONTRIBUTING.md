@@ -1,7 +1,8 @@
 # Contributing
 
-Welcome. Card Vault is a monorepo with three stacks (Symfony API, Angular
-frontend, FastAPI ML service) orchestrated with Docker Compose.
+Welcome. Card Vault is a monorepo with four deployable pieces (Caddy proxy,
+Symfony API, Angular frontend, FastAPI ML service) orchestrated with Docker
+Compose.
 
 ## Quick start
 

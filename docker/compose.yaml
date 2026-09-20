@@ -41,17 +41,18 @@ services:
       APP_SECRET: ${APP_SECRET:?error}
       DEFAULT_URI: ${DEFAULT_URI:?error}
       DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
-      REDIS_URL: redis://redis:6379
-      SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
+      REDIS_CACHE_URL: redis://redis-cache:6379
+      REDIS_SESSION_URL: redis://redis-session:6379
       CADDY_ROOT_FOLDER: /home/${PROJECT_NAME:?error}/sources/api/public
-      CADDY_CORS_ORIGIN: ${PROJECT_DOMAIN:?error}
       CONTAINER_USER: ${PROJECT_NAME:?error}
     volumes:
       - api_var:/home/${PROJECT_NAME:?error}/sources/api/var
     depends_on:
       database:
         condition: service_healthy
-      redis:
+      redis-cache:
+        condition: service_healthy
+      redis-session:
         condition: service_healthy
 
   frontend:
@@ -79,9 +80,6 @@ services:
     restart: unless-stopped
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
-    depends_on:
-      redis:
-        condition: service_healthy
 
   database:
     image: postgres:${POSTGRES_VERSION:?error}-alpine
@@ -99,10 +97,39 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  # Application cache
+  redis-cache:
     image: redis:${REDIS_VERSION:?error}-alpine
     restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
+    command:
+      - redis-server
+      - --save
+      - ""
+      - --appendonly
+      - "no"
+      - --maxmemory
+      - ${REDIS_CACHE_MAXMEMORY:?error}
+      - --maxmemory-policy
+      - allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Sessions
+  redis-session:
+    image: redis:${REDIS_VERSION:?error}-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - ${REDIS_SESSION_MAXMEMORY:?error}
+      - --maxmemory-policy
+      - noeviction
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       start_period: 5s
@@ -110,11 +137,11 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis_data:/data
+      - redis_session_data:/data
 
 volumes:
   database_data:
-  redis_data:
+  redis_session_data:
   api_var:
   caddy_data:
   caddy_config:

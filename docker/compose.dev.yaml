@@ -31,10 +31,9 @@ services:
       APP_ENV: dev
       APP_DEBUG: 1
       DATABASE_URL: postgresql://${POSTGRES_USER:?error}:${POSTGRES_PASSWORD:?error}@database:5432/${POSTGRES_DB:?error}?serverVersion=${POSTGRES_VERSION:?error}&charset=utf8
-      REDIS_URL: redis://redis:6379
-      SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
+      REDIS_CACHE_URL: redis://redis-cache:6379
+      REDIS_SESSION_URL: redis://redis-session:6379
       CADDY_ROOT_FOLDER: /home/${PROJECT_NAME:?error}/sources/api/public
-      CADDY_CORS_ORIGIN: ${PROJECT_DOMAIN:?error}
       CONTAINER_USER: ${PROJECT_NAME:?error}
       MAILER_DSN: smtp://mailsink:1025
       XDEBUG_MODE: ${XDEBUG_MODE:-debug}
@@ -85,17 +84,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    depends_on:
-      redis:
-        condition: service_healthy
 
   database:
     ports:
       - "5432:5432"
 
-  redis:
+  redis-cache:
     ports:
       - "6379:6379"
+
+  redis-session:
+    ports:
+      - "6380:6379"
 
   mailsink:
     image: axllent/mailpit:latest
@@ -125,12 +125,14 @@ services:
     volumes:
       - redisinsight_data:/data
     depends_on:
-      redis:
+      redis-cache:
+        condition: service_healthy
+      redis-session:
         condition: service_healthy
 
 volumes:
   database_data:
-  redis_data:
+  redis_session_data:
   api_var:
   caddy_data:
   caddy_config:

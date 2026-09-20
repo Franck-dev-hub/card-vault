@@ -11,13 +11,14 @@ ENV_FILE="${APP_DIR}/.env"
 if [ -f "${ENV_FILE}" ] && [ -n "${APP_DEBUG:-}" ] && [ -n "${DATABASE_URL:-}" ]; then
     # .env already present and required vars are provided: nothing to do.
     :
-elif [ -n "${DATABASE_URL:-}" ] || [ -n "${REDIS_URL:-}" ]; then
+elif [ -n "${DATABASE_URL:-}" ] || [ -n "${REDIS_CACHE_URL:-}" ]; then
     # No .env committed: build one from the injected environment.
     : > "${ENV_FILE}"
     [ -n "${APP_ENV:-}" ] && echo "APP_ENV=${APP_ENV}" >> "${ENV_FILE}"
     [ -n "${APP_SECRET:-}" ] && echo "APP_SECRET=${APP_SECRET}" >> "${ENV_FILE}"
     [ -n "${DATABASE_URL:-}" ] && echo "DATABASE_URL=${DATABASE_URL}" >> "${ENV_FILE}"
-    [ -n "${REDIS_URL:-}" ] && echo "REDIS_URL=${REDIS_URL}" >> "${ENV_FILE}"
+    [ -n "${REDIS_CACHE_URL:-}" ] && echo "REDIS_CACHE_URL=${REDIS_CACHE_URL}" >> "${ENV_FILE}"
+    [ -n "${REDIS_SESSION_URL:-}" ] && echo "REDIS_SESSION_URL=${REDIS_SESSION_URL}" >> "${ENV_FILE}"
 fi
 
 # Wait for the database to be reachable before booting the app.

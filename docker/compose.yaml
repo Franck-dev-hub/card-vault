@@ -44,7 +44,6 @@ services:
       REDIS_CACHE_URL: redis://redis-cache:6379
       REDIS_SESSION_URL: redis://redis-session:6379
       CADDY_ROOT_FOLDER: /home/${PROJECT_NAME:?error}/sources/api/public
-      CADDY_CORS_ORIGIN: ${PROJECT_DOMAIN:?error}
       CONTAINER_USER: ${PROJECT_NAME:?error}
     volumes:
       - api_var:/home/${PROJECT_NAME:?error}/sources/api/var

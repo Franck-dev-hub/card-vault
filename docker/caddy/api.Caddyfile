@@ -14,17 +14,4 @@
 		X-Content-Type-Options nosniff
 		X-Frame-Options DENY
 	}
-
-	# CORS for the Angular frontend (same-origin in prod, explicit in dev)
-	@cors_preflight method OPTIONS
-	handle @cors_preflight {
-		header Access-Control-Allow-Origin {$CADDY_CORS_ORIGIN:*}
-		header Access-Control-Allow-Methods "GET, POST, PATCH, DELETE, OPTIONS"
-		header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-		header Access-Control-Max-Age "3600"
-		respond 204
-	}
-	header Access-Control-Allow-Origin {$CADDY_CORS_ORIGIN:*}
-	header Access-Control-Allow-Methods "GET, POST, PATCH, DELETE, OPTIONS"
-	header Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
 }

@@ -79,6 +79,15 @@ final class UpstreamAwareHttpClientTest extends TestCase
         }
     }
 
+    public function testStatus500IsAlreadyAnOutage(): void
+    {
+        $client = new UpstreamAwareHttpClient($this->clientReturning(new Response(500)), 'pokemon');
+
+        $this->expectException(UpstreamNotAvailableException::class);
+
+        $client->sendRequest(new Request('GET', '/sets'));
+    }
+
     public function testNetworkFailureIsReportedAsAnOutageAndKeepsItsCause(): void
     {
         $cause = new class('Connection timed out') extends \RuntimeException implements ClientExceptionInterface {};

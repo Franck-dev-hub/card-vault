@@ -79,6 +79,24 @@ final class StateProviderTest extends TestCase
         $provider->provide(new Get(), ['slug' => 'pokemon', 'cardId' => 'pokemon-base1-1']);
     }
 
+    public function testCardCollectionProviderRejectsANonStringExtensionId(): void
+    {
+        $provider = new CardCollectionProvider($this->registryFor($this->createStub(LicenceClientInterface::class)));
+
+        $this->expectException(\AssertionError::class);
+
+        $provider->provide(new GetCollection(), ['slug' => 'pokemon', 'setId' => 1]);
+    }
+
+    public function testCardItemProviderRejectsANonStringCardId(): void
+    {
+        $provider = new CardItemProvider($this->registryFor($this->createStub(LicenceClientInterface::class)));
+
+        $this->expectException(\AssertionError::class);
+
+        $provider->provide(new Get(), ['slug' => 'pokemon', 'cardId' => 1]);
+    }
+
     private function card(): Card
     {
         return new Card(

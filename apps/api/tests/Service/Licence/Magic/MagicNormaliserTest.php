@@ -93,6 +93,24 @@ final class MagicNormaliserTest extends TestCase
         self::assertSame('https://cards.scryfall.io/normal/front/delver.jpg', $card->cardImage);
     }
 
+    public function testRootImageWinsOverFaceImages(): void
+    {
+        $card = $this->normaliser->normaliseCard([
+            'id' => 'uuid',
+            'name' => 'Brisela, Voice of Nightmares',
+            'collector_number' => '15',
+            'set' => 'emn',
+            'set_name' => 'Eldritch Moon',
+            'nonfoil' => true,
+            'image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/brisela.jpg'],
+            'card_faces' => [
+                ['image_uris' => ['normal' => 'https://cards.scryfall.io/normal/front/bruna.jpg']],
+            ],
+        ]);
+
+        self::assertSame('https://cards.scryfall.io/normal/front/brisela.jpg', $card->cardImage);
+    }
+
     public function testCardWithoutPricesOrImageStaysValid(): void
     {
         $card = $this->normaliser->normaliseCard([

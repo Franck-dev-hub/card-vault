@@ -70,11 +70,22 @@ final class MagicClientTest extends TestCase
         self::assertSame('magic-second', $cards[1]->cardId);
     }
 
+    public function testListCardsSearchesTheSetByItsCode(): void
+    {
+        $response = $this->json(['has_more' => false, 'data' => []]);
+        $client = $this->buildClient([$response]);
+
+        $client->listCards('woe');
+
+        self::assertSame('https://api.scryfall.com/cards/search?q=set%3Awoe', $response->getRequestUrl());
+    }
+
     public function testListCardsThrowsWhenExtensionIsUnknown(): void
     {
         $client = $this->buildClient([$this->json([], 404)]);
 
         $this->expectException(LicenceNotFoundException::class);
+        $this->expectExceptionCode(0);
 
         $client->listCards('does-not-exist');
     }

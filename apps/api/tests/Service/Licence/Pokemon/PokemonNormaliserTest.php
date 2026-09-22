@@ -113,6 +113,35 @@ final class PokemonNormaliserTest extends TestCase
     }
 
     #[IgnoreDeprecations]
+    public function testMissingCardmarketFiguresDefaultToZero(): void
+    {
+        $sdkCard = Model::build(new SdkCard($this->sdk), $this->fixture([
+            'id' => 'base1-1',
+            'localId' => '1',
+            'name' => 'Alakazam',
+            'rarity' => 'Rare Holo',
+            'set' => ['id' => 'base1', 'name' => 'Base'],
+            'variants' => [
+                'normal' => false,
+                'reverse' => false,
+                'holo' => true,
+                'firstEdition' => false,
+                'wPromo' => false,
+            ],
+            'variants_detailed' => [
+                ['type' => 'holo', 'pricing' => ['cardmarket' => (object) []]],
+            ],
+        ]));
+        self::assertNotNull($sdkCard);
+
+        $price = $this->normaliser->normaliseCard($sdkCard)->prices['holo'];
+
+        self::assertSame(0.0, $price->avg);
+        self::assertSame(0.0, $price->low);
+        self::assertSame(0.0, $price->trend);
+    }
+
+    #[IgnoreDeprecations]
     public function testNormaliseCardHandlesMissingImageIllustratorAndPricing(): void
     {
         $sdkCard = Model::build(new SdkCard($this->sdk), $this->fixture([

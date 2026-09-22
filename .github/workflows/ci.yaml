@@ -6,107 +6,136 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   backend:
     name: Backend
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
+    container:
+      image: ghcr.io/franck-dev-hub/ci/php:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      # The image user cannot write to the runner's workspace.
+      options: --user root
+    services:
+      database:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      APP_ENV: test
+      APP_DEBUG: 1
+      DEFAULT_URI: http://localhost
+      DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=16&charset=utf8
+      COMPOSER_ALLOW_SUPERUSER: 1
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Infection diffs against the base branch.
+          fetch-depth: 0
 
-      - name: Prepare environment
-        run: make env
+      # git refuses a workspace owned by another user.
+      - name: Trust the workspace for git
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # GH runner uid 1001 vs image user uid 1000: align mount ownership
-      - name: Align source permissions with the container user
-        run: sudo chown -R 1000:1000 apps
-
-      - name: Build CI image
-        if: hashFiles('apps/api/composer.json') != ''
-        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local build php
+      - name: Install
+        run: castor setup:backend
 
       - name: Lint
-        if: hashFiles('apps/api/composer.json') != ''
-        run: make lint/backend
+        run: castor lint:backend
 
       - name: Security audit
-        if: hashFiles('apps/api/composer.json') != ''
-        run: make sec/backend
+        run: castor security:backend
 
       - name: Tests
-        if: hashFiles('apps/api/composer.json') != ''
-        run: make test/backend
+        run: castor tests:backend
+
+      - name: Mutation testing on changed lines
+        run: castor tests:backend:infection --diff-base=origin/${{ github.base_ref }}
 
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
+    container:
+      image: node:22-slim
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare environment
-        run: make env
+      - uses: castor-php/setup-castor@v1.1.0
+        with:
+          version: v1.7.0
 
-      # GH runner uid 1001 vs image user uid 1000: align mount ownership
-      - name: Align source permissions with the container user
-        run: sudo chown -R 1000:1000 apps
+      - name: Install
+        run: castor setup:frontend
 
       - name: Lint
-        if: hashFiles('apps/frontend/package.json') != ''
-        run: make lint/frontend
+        run: castor lint:frontend
 
       - name: Security audit
-        if: hashFiles('apps/frontend/package.json') != ''
-        run: make sec/frontend
+        run: castor security:frontend
 
       - name: Tests
-        if: hashFiles('apps/frontend/package.json') != ''
-        run: make test/frontend
+        run: castor tests:frontend
 
   ml:
     name: Machine learning
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false
+    container:
+      image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare environment
-        run: make env
+      - uses: castor-php/setup-castor@v1.1.0
+        with:
+          version: v1.7.0
 
-      - name: Align source permissions with the container user
-        run: sudo chown -R 1000:1000 apps
+      - name: Install
+        run: castor setup:ml
 
       - name: Lint
-        if: hashFiles('apps/ml/pyproject.toml') != ''
-        run: make lint/ml
+        run: castor lint:ml
 
       - name: Security audit
-        if: hashFiles('apps/ml/pyproject.toml') != ''
-        run: make sec/ml
+        run: castor security:ml
 
       - name: Tests
-        if: hashFiles('apps/ml/pyproject.toml') != ''
-        run: make test/ml
+        run: castor tests:ml
 
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.base_ref == 'prod' && github.event.pull_request.draft == false
+    if: github.base_ref == 'prod' && github.event.pull_request.draft == false
+    env:
+      # E2E needs the whole Docker stack.
+      CASTOR_RUNTIME: host
     steps:
       - uses: actions/checkout@v4
 
+      - uses: castor-php/setup-castor@v1.1.0
+        with:
+          version: v1.7.0
+
       - name: Prepare environment
-        run: make env
+        run: castor setup:env
 
       # GH runner uid 1001 vs image user uid 1000: align mount ownership
       - name: Align source permissions with the container user
         run: sudo chown -R 1000:1000 apps
 
       - name: Build Playwright image
-        if: hashFiles('apps/frontend/package.json') != ''
         run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local --profile e2e build playwright
 
       - name: Run E2E
-        if: hashFiles('apps/frontend/package.json') != ''
-        run: make test/e2e
+        run: castor tests:e2e

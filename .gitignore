@@ -40,3 +40,4 @@ playwright-report/
 AGENTS.md
 CLAUDE.md
 /docs/agents/
+/.castor.stub.php

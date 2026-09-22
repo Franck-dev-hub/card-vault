@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Docker with Docker Compose
-- GNU Make
+- Castor
 - Git
 
 ## Clone
@@ -19,7 +19,7 @@ Generate the gitignored local environment overrides (secrets, database
 credentials, `HF_TOKEN`, ...). Fill in `HF_TOKEN` by hand afterwards.
 
 ```bash
-make env
+castor setup:env
 ```
 
 See [Configuration](configuration.md) for the full variable list.
@@ -27,10 +27,16 @@ See [Configuration](configuration.md) for the full variable list.
 ## Build and run
 
 ```bash
-make            # print all targets
-make dev/build  # build and start the dev stack (first launch)
-make dev/up     # start the stack after a build
+castor                   # list all tasks
+castor docker:build      # build and start the dev stack (first launch)
+castor setup:backend     # install PHP dependencies
+castor setup:frontend    # install JS dependencies
+castor up                # start the stack after a build
+castor stop              # stop the stack
+castor terminal          # shell in the api container (`sf` = bin/console)
 ```
+
+App tasks run inside the dev containers, so the stack must be up.
 
 ## URLs
 
@@ -47,48 +53,36 @@ make dev/up     # start the stack after a build
 ## Tests and lint
 
 ```bash
-make lint           # lint all stacks
-make lint/fix        # auto-fix what can be
-make test/backend   # PHPUnit
-make test/frontend  # Vitest (needs apps/frontend deps)
-make test/ml        # pytest
-make test/e2e       # Playwright
-make test/infection # Infection mutation testing
-make ci             # lint + security + all tests
+castor lint                  # lint all stacks
+castor lint --fix            # auto-fix what can be, then lint
+castor lint:backend          # one stack: backend, frontend, ml
+castor lint:backend:phpstan  # one tool, named after its stack
+castor security:all          # dependency audits
+castor tests:backend         # PHPUnit
+castor tests:frontend        # Vitest
+castor tests:ml              # pytest
+castor tests:e2e             # Playwright
+castor tests:backend:infection  # Infection mutation testing
+castor ci:backend            # one stack's CI checks
+castor ci                    # every stack; Infection runs on the whole tree
 ```
 
 ## Managing dependencies
 
-Frontend (pnpm):
-
 ```bash
-docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
-  run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 frontend \
-  sh -c "corepack pnpm add <package>"
-
-docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
-  run --rm --no-deps -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 frontend \
-  sh -c "corepack pnpm update --latest"
-```
-
-Backend (composer):
-
-```bash
-docker compose -f docker/compose.yaml -f docker/compose.dev.yaml \
-  run --rm --no-deps api sh -c "composer update"
+castor frontend:pnpm add <package>
+castor frontend:pnpm update --latest
+castor backend:composer update
+castor ml:uv add <package>
+castor backend:composer -- --version   # castor's own flags (-v, -q, -n, -h, --version) go after --
 ```
 
 ## Migrations
 
 ```bash
-make migrate        # apply pending migrations
-make migrate-diff   # generate a migration from entity changes
-```
-
-## Dev environment
-
-```bash
-make dev/up         # dev stack (hot reload, mailpit, pgadmin, redisinsight)
+castor backend:migrate        # apply pending migrations
+castor backend:migrate-diff   # generate a migration from entity changes
+castor reset                  # wipe the dev database and replay every migration
 ```
 
 Preprod and prod environments are managed by the maintainer and are not

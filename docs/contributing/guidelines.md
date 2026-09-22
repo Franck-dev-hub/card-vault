@@ -46,7 +46,7 @@
 
 ## Quality bar
 
-- Run `make ci` before finishing any work: lint + security + backend/frontend/ml
+- Run `castor ci` before finishing any work: lint + security + backend/frontend/ml
   tests. Same checks run on every PR in GitHub Actions.
 - E2E (Playwright) must cover critical paths before release.
 

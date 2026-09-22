@@ -1,11 +1,11 @@
 # Configuration
 
 All configuration goes through environment files, layered per environment.
-`.env` is the committed base placeholder; run `make env` to generate the
+`.env` is the committed base placeholder; run `castor setup:env` to generate the
 gitignored local overrides that hold the real secrets:
 
 ```bash
-make env            # .env.local (dev, full copy with generated secrets)
+castor setup:env    # .env.local (dev, full copy with generated secrets)
 ```
 
 Each compose invocation reads the chain `.env` → per-env override →

@@ -1,0 +1,45 @@
+name: CI images
+
+# A PR changing the image still runs on the previous one until merged.
+on:
+  push:
+    branches:
+      - develop
+      - chore/72-castor
+    paths:
+      - docker/Dockerfile
+      - docker/compose.ci.yaml
+      - docker/php/**
+      - .github/workflows/ci-images.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  php:
+    name: Build and push ci/php
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: castor-php/setup-castor@v1.1.0
+        with:
+          version: v1.7.0
+
+      - name: Prepare environment
+        run: castor setup:env
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local build php
+
+      - name: Push
+        run: docker compose -f docker/compose.yaml -f docker/compose.ci.yaml --env-file .env --env-file .env.local push php

@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - develop
-      - chore/72-castor
     paths:
+      - .env
       - docker/Dockerfile
       - docker/compose.ci.yaml
       - docker/php/**

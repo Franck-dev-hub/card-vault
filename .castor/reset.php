@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace reset;
 
+use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 
 use function Castor\io;
 
 #[AsTask(name: 'database', description: 'Wipe the dev database and replay every migration', aliases: ['reset'])]
-function database(): void
-{
+function database(
+    #[AsOption(description: 'Skip the confirmation')]
+    bool $force = false,
+): void {
+    if (!$force && !io()->confirm('This wipes every table of the dev database. Continue?', false)) {
+        return;
+    }
+
     io()->section('Create the database if missing');
     \exec_in(\App::Backend, ['bin/console', 'doctrine:database:create', '--if-not-exists']);
 

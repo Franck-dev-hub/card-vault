@@ -8,6 +8,8 @@ use Castor\Context;
 use function Castor\guard_min_version;
 use function Castor\import;
 
+defined('CASTOR_USE_CHDIR') || define('CASTOR_USE_CHDIR', true);
+
 guard_min_version('v1.7.0');
 
 import(__DIR__ . '/.castor/');

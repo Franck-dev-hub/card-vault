@@ -1,0 +1,3 @@
+#!/bin/sh
+# Fails the push locally instead of in CI; bypass with `git push --no-verify`.
+exec castor ci:all

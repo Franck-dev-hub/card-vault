@@ -11,6 +11,6 @@ final class UpstreamNotAvailableException extends LicenceClientException
         string $message,
         ?\Throwable $previous = null,
     ) {
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, previous: $previous);
     }
 }

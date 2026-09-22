@@ -79,13 +79,13 @@ The platform offers advanced filtering, cross-game organization, and an integrat
 
 ## Installation
 
-Requires Docker with Docker Compose, GNU Make and Git.
+Requires Docker with Docker Compose, [Castor](https://castor.jolicode.com) and Git.
 
 ```bash
 git clone https://github.com/Franck-dev-hub/card-vault.git
 cd card-vault
-make env        # generate the gitignored local secrets
-make dev/build  # build and start the dev stack
+castor setup:env      # generate the gitignored local secrets
+castor docker:build   # build and start the dev stack
 ```
 
 The app is then served at http://card-vault.localhost, the API docs at

@@ -2,16 +2,16 @@
 
 ## Environment
 
-### `make env` fails or `.env.local` is missing
+### `castor setup:env` fails or `.env.local` is missing
 
-`.env.local` is generated once and gitignored. Delete it and re-run `make env`,
+`.env.local` is generated once and gitignored. Delete it and re-run `castor setup:env`,
 which regenerates secrets automatically.
 
 ### The ML models are not downloading
 
 The ML service needs `HF_TOKEN` on first run. Fill it in `.env.local`
 (found in your Hugging Face account settings) and restart the stack:
-`make dev/build/ml`. The model cache lives in the `ml_hf_cache` volume.
+`castor docker:build --service=ml`. The model cache lives in the `ml_hf_cache` volume.
 
 ### Ports already in use
 
@@ -34,17 +34,16 @@ fetched live, so an upstream outage surfaces as an empty or erroring search.
 
 ## Development
 
-### `make ci` fails while lint/tests pass individually
+### `castor ci` fails while lint/tests pass individually
 
-`make ci` runs lint plus security audits plus all three test suites. The
+`castor ci` runs lint plus security audits plus all three test suites. The
 security steps (`pnpm audit`, `composer audit`, `pip-audit`) find issues that
 lint and tests do not. Read the failing step's output and fix the dependency
 or the code it flags.
 
-### phpstan/php-cs-fixer are slow in the CI image
+### `castor lint:backend` fails with "service api is not running"
 
-They run inside the container on every invocation. That is expected; use
-`make lint/backend` only when you change PHP code.
+App tasks run inside the dev containers. Start the stack with `castor up`.
 
 ## See also
 

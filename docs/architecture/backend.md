@@ -66,7 +66,7 @@ Doctrine Migrations, fixtures for test data. No tables defined yet.
 
 ## Custom CLI commands
 
-None yet. The `make migrate` and `make migrate-diff` targets call the standard
+None yet. The `castor backend:migrate` and `castor backend:migrate-diff` tasks call the standard
 Doctrine commands.
 
 ## Adding a card game

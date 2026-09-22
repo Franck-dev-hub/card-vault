@@ -26,6 +26,6 @@ cookie.
   redis-cache, redis-session) with healthchecks and `restart: unless-stopped`.
 - `docker/compose.dev.yaml`: dev overlay (hot reload, mailpit, pgadmin,
   redisinsight).
-- `make dev/up` starts the dev environment.
+- `castor up` starts the dev environment.
 
 TLS and the preprod/prod overlays are managed by the maintainer.

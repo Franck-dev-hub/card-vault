@@ -3,12 +3,19 @@ ARG FRANKENPHP_VERSION=1.12.6
 ARG COMPOSER_VERSION=2.9
 ARG NODEJS_VERSION=22
 ARG PHP_EXTENSION_INSTALLER_VERSION=2
+ARG CASTOR_VERSION=1.7.0
 
 FROM composer/composer:${COMPOSER_VERSION} AS composer
 
 FROM mlocati/php-extension-installer:${PHP_EXTENSION_INSTALLER_VERSION} AS php_extension_installer
 
 FROM node:${NODEJS_VERSION}-slim AS node
+
+FROM scratch AS castor
+
+ARG CASTOR_VERSION
+
+ADD https://github.com/jolicode/castor/releases/download/v${CASTOR_VERSION}/castor.linux-amd64.phar /castor
 
 # ---------------------------------------------------------------------------
 # FrankenPHP base (web server with embedded Caddy for the Symfony/API Platform app)
@@ -118,6 +125,7 @@ RUN <<-EOF
 EOF
 
 COPY --link docker/php/pcov.ini $PHP_INI_DIR/conf.d/pcov.ini
+COPY --from=castor --chmod=755 /castor /usr/local/bin/castor
 
 RUN mkdir -p /home/${USER}/.composer && chown ${USER_ID}:${GROUP_ID} /home/${USER}/.composer
 

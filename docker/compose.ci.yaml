@@ -7,6 +7,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
       target: php_ci
+      labels:
+        org.opencontainers.image.source: https://github.com/Franck-dev-hub/card-vault
       args:
         PHP_VERSION: ${PHP_VERSION:?error}
         COMPOSER_VERSION: ${COMPOSER_VERSION:?error}

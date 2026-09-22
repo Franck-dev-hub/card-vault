@@ -27,6 +27,7 @@ final class LicenceClientRegistryTest extends KernelTestCase
         $registry = self::getContainer()->get(LicenceClientRegistry::class);
 
         $this->expectException(LicenceNotFoundException::class);
+        $this->expectExceptionMessageIs('Licence not found: does-not-exist');
 
         $registry->get('does-not-exist');
     }

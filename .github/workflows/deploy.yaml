@@ -62,7 +62,7 @@ jobs:
 
             # Fail fast if prod secrets are still placeholders
             if [ ! -f .env.prod.local ]; then
-              echo "ERROR: .env.prod.local is missing. Create it on the host (see 'make env/prod')."
+              echo "ERROR: .env.prod.local is missing. Create it on the host with APP_SECRET, POSTGRES_PASSWORD and PGADMIN_PASSWORD."
               exit 1
             fi
             for key in APP_SECRET POSTGRES_PASSWORD; do

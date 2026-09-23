@@ -59,7 +59,6 @@ function display_urls(): void
     io()->definitionList(
         ['Frontend' => 'http://' . $domain],
         ['API' => 'http://' . $domain . '/api'],
-        ['ML' => 'http://' . $domain . '/ml'],
         ['PgAdmin' => 'http://localhost:5050'],
         ['RedisInsight' => 'http://localhost:5540'],
         ['Mailpit' => 'http://localhost:8025'],

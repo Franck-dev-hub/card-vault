@@ -45,7 +45,6 @@ App tasks run inside the dev containers, so the stack must be up.
 | Frontend     | http://card-vault.localhost          |
 | Backend API  | http://card-vault.localhost/api      |
 | API docs     | http://card-vault.localhost/api/docs |
-| ML service   | http://card-vault.localhost/ml       |
 | pgAdmin      | http://localhost:5050                |
 | RedisInsight | http://localhost:5540                |
 | Mailpit      | http://localhost:8025                |

@@ -9,8 +9,12 @@ embeds its own Caddy on port 8000.
 |--------------|--------------------|-----------------|
 | `/api/*`     | api (FrankenPHP)   | 8000            |
 | `/bundles/*` | api (FrankenPHP)   | 8000            |
-| `/ml/*`      | ml (FastAPI)       | 5000            |
+| `/ml/*`      | none, answers 404  |                 |
 | `/`          | frontend (Angular) | 80, 4200 in dev |
+
+The ML service is internal: only the backend reaches it, at `http://ml:5000` on
+the Docker network. The explicit 404 stops `/ml/*` from falling through to the
+Angular SPA, which would answer 200.
 
 Security headers on every response: `X-Content-Type-Options`, `X-Frame-Options`,
 `Referrer-Policy`, `Strict-Transport-Security`.

@@ -8,8 +8,9 @@ Dependencies managed with uv (`pyproject.toml` + `uv.lock`) in the image build.
 ## Role
 
 Card image classification: given a photo of a card, return the best matching
-cards. The service is internal, proxied by the backend at `/api/scan`, never
-exposed to the browser.
+cards. The service is internal: it publishes no port and the public proxy
+answers 404 on `/ml/*`. Only the backend calls it, at `http://ml:5000` on the
+Docker network; the `/api/scan` endpoint that will do so is tracked in #16.
 
 ## Training vs inference
 

@@ -1,5 +1,5 @@
 # Front proxy (Caddy) - preproduction entry point (HTTP only)
-# Routes /api/* to the FrankenPHP API, /ml/* to the ML service, everything else to the Angular frontend.
+# Routes /api/* to the FrankenPHP API, everything else to the Angular frontend. /ml/* answers 404: ML is internal only.
 http://{$CADDY_DOMAIN_NAME} {
 	encode zstd gzip
 
@@ -16,7 +16,7 @@ http://{$CADDY_DOMAIN_NAME} {
 	}
 
 	handle /ml/* {
-		reverse_proxy ml:5000
+		respond 404
 	}
 
 	handle {

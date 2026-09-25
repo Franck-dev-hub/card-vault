@@ -16,7 +16,8 @@ cd card-vault
 ## Environment
 
 Generate `.env.local` with random dev secrets, then fill in `HF_TOKEN` by hand.\
-The same task enables the pre-push hook, which runs `castor ci` before every push.
+The same task enables the pre-push hook, which runs `castor ci` before every
+push.
 
 ```bash
 castor setup:env
@@ -84,10 +85,13 @@ castor backend:migrate-diff   # generate a migration from entity changes
 castor reset                  # wipe the dev database and replay every migration
 ```
 
-Preprod and prod environments are managed by the maintainer and are not covered here.
+Preprod and prod environments are managed by the maintainer and are not covered
+here.
 
 ## Next steps
 
 - Work through [troubleshooting](troubleshooting.md) if something fails.
-- Read the [architecture overview](../architecture/overview.md) before touching code.
-- Read the [contributing guidelines](../../CONTRIBUTING.md) before your first commit.
+- Read the [architecture overview](../architecture/overview.md) before touching
+  code.
+- Read the [contributing guidelines](../../CONTRIBUTING.md) before your first
+  commit.

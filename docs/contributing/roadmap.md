@@ -8,8 +8,10 @@ Each minor version after it is a themed update.
 V1.0 is the first public release on prod.\
 Everything before it ships to preprod.
 
-Each milestone is dependency-closed: no ticket in one depends on a ticket in a later one, so they can be taken in order.\
-The next thing to work on is always the lowest milestone still holding open tickets.
+Each milestone is dependency-closed: no ticket in one depends on a ticket in a
+later one, so they can be taken in order.\
+The next thing to work on is always the lowest milestone still holding open
+tickets.
 
 | Milestone | Delivers                                               | Target  |
 |-----------|--------------------------------------------------------|---------|
@@ -26,7 +28,8 @@ The next thing to work on is always the lowest milestone still holding open tick
 ## Planned
 
 Product scope only.\
-Infrastructure, observability and compliance tickets use the same milestones but are not listed here.
+Infrastructure, observability and compliance tickets use the same milestones but
+are not listed here.
 
 ### V1.0
 
@@ -58,7 +61,8 @@ Infrastructure, observability and compliance tickets use the same milestones but
 
 - Display card prices
 - Change card language
-- Update card condition (Near Mint, Mint, Excellent, Good, Lightly Played, Played, Poor)
+- Update card condition (Near Mint, Mint, Excellent, Good, Lightly Played,
+  Played, Poor)
 
 ### V1.3: Value update
 
@@ -120,7 +124,8 @@ Infrastructure, observability and compliance tickets use the same milestones but
 
 ### V1.8: Multi-select update
 
-- Personalised theme (full colour customisation with a main and secondary colour)
+- Personalised theme (full colour customisation with a main and secondary
+  colour)
 - Inventory
     - Multi-select to add a card
     - Multi-select to delete a card
@@ -165,7 +170,8 @@ Infrastructure, observability and compliance tickets use the same milestones but
 
 ### For now
 
-- ONNX Runtime: model export planned, deferred until camera scan becomes a bottleneck.
+- ONNX Runtime: model export planned, deferred until camera scan becomes a
+  bottleneck.
 
 ### Completely out of scope
 

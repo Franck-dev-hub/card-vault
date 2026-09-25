@@ -1,12 +1,14 @@
 # Card Vault
 
-Card Vault tracks the trading cards a user owns, across several card games, and recognises a card from a photo.\
+Card Vault tracks the trading cards a user owns, across several card games, and
+recognises a card from a photo.\
 This file is the glossary: one word per concept, and the word used here wins.
 
 ## Catalogue
 
 **Game**:\
-A trading card game supported by Card Vault, such as Pokémon or Magic: The Gathering.\
+A trading card game supported by Card Vault, such as Pokémon or Magic: The
+Gathering.\
 Never a match being played: Card Vault does not track matches.\
 _Avoid_: licence, franchise, TCG
 
@@ -38,7 +40,8 @@ The physical state of a copy, from Mint to Poor.\
 _Avoid_: grade, which means a professional grading score
 
 **Inventory**:\
-A physical storage place, such as a binder or a box, holding copies from the vault, of any game.\
+A physical storage place, such as a binder or a box, holding copies from the
+vault, of any game.\
 A copy sits in one inventory at most, or in none.\
 _Avoid_: binder, box, list
 

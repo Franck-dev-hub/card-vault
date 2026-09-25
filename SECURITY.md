@@ -2,7 +2,9 @@
 
 **Do not open a public issue.**
 
-Report it through a [private security advisory](https://github.com/Franck-dev-hub/card-vault/security/advisories/new), using this template:
+Report it through a
+[private security advisory](https://github.com/Franck-dev-hub/card-vault/security/advisories/new),
+using this template:
 
 ```
 Summary:      one line
@@ -12,4 +14,5 @@ Reproduction: steps or proof of concept
 ```
 
 Only the latest `prod` is patched.\
-Upstream services (TCGdex, Scryfall, Hugging Face) and dependencies are out of scope: report them upstream.
+Upstream services (TCGdex, Scryfall, Hugging Face) and dependencies are out of
+scope: report them upstream.

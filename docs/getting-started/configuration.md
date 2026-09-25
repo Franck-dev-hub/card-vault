@@ -2,7 +2,8 @@
 
 All configuration goes through environment files.\
 `.env` is committed and holds placeholders.\
-Run `castor setup:env` to generate the gitignored `.env.local`, which holds the real secrets:
+Run `castor setup:env` to generate the gitignored `.env.local`, which holds the
+real secrets:
 
 ```bash
 castor setup:env    # .env.local (dev, full copy with generated secrets)
@@ -11,7 +12,8 @@ castor setup:env    # .env.local (dev, full copy with generated secrets)
 Docker Compose reads `.env`, then `.env.local`; the later file wins.
 
 Real secrets are never committed.\
-The preprod and prod environments and their secret overrides are managed by the maintainer.
+The preprod and prod environments and their secret overrides are managed by the
+maintainer.
 
 ## Variables
 
@@ -43,7 +45,8 @@ The preprod and prod environments and their secret overrides are managed by the 
 | `PGADMIN_EMAIL` / `PGADMIN_PASSWORD`                  | pgAdmin login (dev)                                          |
 | `HF_TOKEN`                                            | Hugging Face token, required to download models on first run |
 
-The API also reads two DSNs, injected by the compose files and defaulted in `apps/api/.env` so that PHPUnit resolves them without Docker:
+The API also reads two DSNs, injected by the compose files and defaulted in
+`apps/api/.env` so that PHPUnit resolves them without Docker:
 
 | Variable            | Description                                 |
 |---------------------|---------------------------------------------|

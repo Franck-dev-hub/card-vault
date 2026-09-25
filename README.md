@@ -38,7 +38,8 @@ Search for a card or point your camera at it, and it lands in your vault.
 ## Features
 
 Status: pre-release.\
-The features below are the V1.0 scope, see the [roadmap](docs/contributing/roadmap.md) for what lands when.
+The features below are the V1.0 scope, see the
+[roadmap](docs/contributing/roadmap.md) for what lands when.
 
 | V1.0 scope                                               | Games                                                                                                                         |
 |----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
@@ -46,7 +47,10 @@ The features below are the V1.0 scope, see the [roadmap](docs/contributing/roadm
 | Add cards to your vault by scanning them with a camera   | ![Pokémon](https://img.shields.io/badge/Pokémon-FFCB05)                                                                       |
 
 ### Upcoming
-- Adding ![Lorcana](https://img.shields.io/badge/Lorcana-E6DBB9) ![YuGiOh](https://img.shields.io/badge/Yu%20Gi%20Oh!-FFD700) ![One Piece](https://img.shields.io/badge/One%20Piece-E74C3C) ![Palworld](https://img.shields.io/badge/Palworld-008080)
+- Adding ![Lorcana](https://img.shields.io/badge/Lorcana-E6DBB9)
+  ![YuGiOh](https://img.shields.io/badge/Yu%20Gi%20Oh!-FFD700)
+  ![One Piece](https://img.shields.io/badge/One%20Piece-E74C3C)
+  ![Palworld](https://img.shields.io/badge/Palworld-008080)
 - Adding inventory and deck building
 - Adding statistics and vault value estimation
 - Improve core code (codebase, CI/CD, Docker ...)
@@ -66,7 +70,8 @@ The features below are the V1.0 scope, see the [roadmap](docs/contributing/roadm
 
 ## Installation
 
-Requires Docker with Docker Compose, [Castor](https://castor.jolicode.com) and Git.
+Requires Docker with Docker Compose, [Castor](https://castor.jolicode.com) and
+Git.
 
 ```bash
 git clone https://github.com/Franck-dev-hub/card-vault.git
@@ -75,18 +80,26 @@ castor setup:env      # generate the gitignored local secrets
 castor docker:build   # build and start the dev stack
 ```
 
-The app is then served at http://card-vault.localhost, the API docs at http://card-vault.localhost/api/docs.
+The app is then served at http://card-vault.localhost, the API docs at
+http://card-vault.localhost/api/docs.
 
-Full setup, service URLs, test and lint commands: [Installation](docs/getting-started/installation.md).
+Full setup, service URLs, test and lint commands:
+[Installation](docs/getting-started/installation.md).
 
 ---
 
 ## Contributing and security
-- Please read our [![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue?logo=git&logoColor=white)](CONTRIBUTING.md)
-- See our [![Roadmap](https://img.shields.io/badge/Roadmap-Plan-informational?logo=github&logoColor=white)](docs/contributing/roadmap.md)
-- Bug reports and feature requests are welcome via [![GitHub issues](https://img.shields.io/badge/GitHub%20issues-121013?logo=github&logoColor=white)](https://github.com/Franck-dev-hub/card-vault/issues)
-- Found a security issue? Please follow our [![Security Policy](https://img.shields.io/badge/Security-Policy-informational?logo=awesomelists&logoColor=white)](SECURITY.md) instead of opening a public issue.
-- The code is AGPL-3.0, the Card Vault name and logo are not: see the [trademark policy](TRADEMARK.md).
+- Please read our
+  [![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue?logo=git&logoColor=white)](CONTRIBUTING.md)
+- See our
+  [![Roadmap](https://img.shields.io/badge/Roadmap-Plan-informational?logo=github&logoColor=white)](docs/contributing/roadmap.md)
+- Bug reports and feature requests are welcome via
+  [![GitHub issues](https://img.shields.io/badge/GitHub%20issues-121013?logo=github&logoColor=white)](https://github.com/Franck-dev-hub/card-vault/issues)
+- Found a security issue? Please follow our
+  [![Security Policy](https://img.shields.io/badge/Security-Policy-informational?logo=awesomelists&logoColor=white)](SECURITY.md)
+  instead of opening a public issue.
+- The code is AGPL-3.0, the Card Vault name and logo are not: see the
+  [trademark policy](TRADEMARK.md).
 
 ---
 
@@ -99,5 +112,7 @@ Full setup, service URLs, test and lint commands: [Installation](docs/getting-st
 ---
 
 ## Community
-- Join our community [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.com)
-- Or help keep the app running [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Us-FF5E5B?&logo=ko-fi&logoColor=white)](https://ko-fi.com/cardvault)
+- Join our community
+  [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.com)
+- Or help keep the app running
+  [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Us-FF5E5B?&logo=ko-fi&logoColor=white)](https://ko-fi.com/cardvault)

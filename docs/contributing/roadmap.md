@@ -61,7 +61,7 @@ are not listed here.
 
 - Display card prices
 - Change card language
-- Update card condition (Near Mint, Mint, Excellent, Good, Lightly Played,
+- Update card condition (Mint, Near Mint, Excellent, Good, Lightly Played,
   Played, Poor)
 
 ### V1.3: Value update

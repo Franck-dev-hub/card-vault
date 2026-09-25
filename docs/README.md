@@ -17,7 +17,7 @@
 
 ## Contributing
 
-- [Contributing guidelines](contributing/guidelines.md)
+- [Contributing guidelines](../CONTRIBUTING.md)
 - [Roadmap](contributing/roadmap.md)
 
 ## User guide

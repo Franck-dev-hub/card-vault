@@ -1,12 +1,12 @@
 # Backend architecture
 
-API Platform exposes the API. The interactive OpenAPI documentation is the
-canonical reference: `http://card-vault.localhost/api/docs` in dev.
+API Platform exposes the API.\
+The interactive OpenAPI documentation is the canonical reference: `http://card-vault.localhost/api/docs` in dev.
 
 ## Endpoints
 
-`Live` means the route answers today. Any endpoint added or implemented must
-flip its row here in the same PR.
+`Live` means the route answers today.\
+Any endpoint added or implemented must flip its row here in the same PR.
 
 | Method | Path                                         | Auth | Status  | Purpose                          |
 |--------|----------------------------------------------|------|---------|----------------------------------|
@@ -30,18 +30,19 @@ flip its row here in the same PR.
 
 ## Structure and organisation
 
-Not implemented yet. The intended layout under `apps/api/src/`:
+Layout under `apps/api/src/`:
 
-- `Controller/`: API Platform resource controllers, no business logic.
+- `Controller/`: plain Symfony controllers, no business logic (`/health`).
 - `Entity/`: Doctrine entities.
 - `Repository/`: Doctrine repositories.
-- `Service/`: business logic and external integrations (TCG APIs, ML client).
-- `Dto/`: API Platform DTOs.
+- `State/`: API Platform state providers, one per operation family.
+- `Service/`: business logic and external integrations, one folder per domain (`Service/Licence/`), DTOs in its `Dto/` subfolder.
+- `ApiResource/`: reserved for API Platform resources that are not DTOs, empty today.
 
 ## Security and authentication
 
-Not implemented yet. The intended model is session-cookie authentication
-(`SESSION_LIFETIME` is already configured in the environment), no JWT.
+Not implemented yet.\
+The intended model is session-cookie authentication (`SESSION_LIFETIME` is already configured in the environment), no JWT.\
 Permissions planned via Symfony Voters.
 
 ## Cache and sessions
@@ -51,25 +52,26 @@ Permissions planned via Symfony Voters.
 | `redis-cache`   | `cache.api` pool, Doctrine result cache in prod | none        | `allkeys-lru` |
 | `redis-session` | PHP sessions                                    | AOF         | `noeviction`  |
 
-Two instances, not one with two databases: `maxmemory` is a property of the
-process, so a single instance cannot both evict cache entries under pressure and
-never evict sessions.
+Two instances, not one with two databases: `maxmemory` is a property of the process, so a single instance cannot both evict cache entries under pressure and never evict sessions.
 
-Inject the pool as `CacheInterface $cacheApi`, default lifetime 7 days. Clear it
-with `cache:pool:clear cache.api`; in `prod` that also clears the Doctrine result
-cache. Sessions live in the other instance and survive even a `FLUSHDB`.
+Inject the pool as `CacheInterface $cacheApi`, default lifetime 7 days.\
+Clear it with `cache:pool:clear cache.api`; in `prod` that also clears the Doctrine result cache.\
+Sessions live in the other instance and survive even a `FLUSHDB`.
 
 ## Database
 
-PostgreSQL (already wired in `docker/compose.yaml`), migrations with
-Doctrine Migrations, fixtures for test data. No tables defined yet.
+PostgreSQL, migrations with Doctrine Migrations, no fixtures yet.
+
+| Table  | Entity | Holds         |
+|--------|--------|---------------|
+| `user` | `User` | `id`, `email` |
 
 ## Custom CLI commands
 
-None yet. The `castor backend:migrate` and `castor backend:migrate-diff` tasks call the standard
-Doctrine commands.
+None yet.\
+The `castor backend:migrate` and `castor backend:migrate-diff` tasks call the standard Doctrine commands.
 
 ## Adding a card game
 
-Card games plug in through the external client plus normaliser pattern. See
-[Add a card game (licence)](tcg-integration.md).
+Card games plug in through the external client plus normaliser pattern.\
+See [Add a card game (licence)](tcg-integration.md).

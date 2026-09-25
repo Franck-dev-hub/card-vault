@@ -2,10 +2,10 @@
 
 ## System
 
-Card Vault is a monorepo with four deployable pieces orchestrated by Docker
-Compose
-The frontend talks only to the API, the API talks to the ML service,
-the TCG APIs, PostgreSQL and the two Redis instances.
+- Card Vault is a monorepo with four deployable pieces orchestrated by Docker Compose.
+- The frontend only talks to the API.\
+  The API talks to the ML service, the TCG APIs, PostgreSQL and the two Redis instances.
+- The ML service calls the API back to enrich its matches with card details.
 
 ```mermaid
 flowchart LR
@@ -16,14 +16,15 @@ flowchart LR
     API --> RC[(redis-cache)]
     API --> RS[(redis-session)]
     API --> ML[ML: FastAPI, DINOv2 + FAISS]
+    ML -. card details .-> API
     API --> TCG[TCG APIs: Pokemon TCGDex, Scryfall]
 ```
 
 ## Layers
 
-| Layer    | Home                       | Role                                               |
-|----------|----------------------------|----------------------------------------------------|
-| API      | [backend.md](backend.md)   | REST API, auth, collection domain, integration hub |
-| Frontend | [frontend.md](frontend.md) | SPA, feature modules, lazy-loaded routes           |
-| ML       | [ml.md](ml.md)             | card image classification via DINOv2 + FAISS       |
-| Proxy    | [proxy.md](proxy.md)       | auto-HTTPS, static serving, reverse proxy          |
+| Layer    | Home                       | Role                                                  |
+|----------|----------------------------|-------------------------------------------------------|
+| API      | [backend.md](backend.md)   | REST API, auth, collection domain, integration hub    |
+| Frontend | [frontend.md](frontend.md) | SPA, standalone components, lazy-loaded routes        |
+| ML       | [ml.md](ml.md)             | card recognition by image similarity (DINOv2 + FAISS) |
+| Proxy    | [proxy.md](proxy.md)       | auto-HTTPS, routing, security headers                 |

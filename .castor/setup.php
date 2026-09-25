@@ -11,10 +11,12 @@ use function Castor\fs;
 use function Castor\io;
 use function Castor\run;
 
-#[AsTask(name: 'env', description: 'Generate the gitignored .env.local with random dev secrets')]
+#[AsTask(name: 'env', description: 'Generate the gitignored .env.local with random dev secrets and enable the git hooks')]
 function env(): void
 {
     $root = \dirname(__DIR__);
+
+    run(['git', 'config', 'core.hooksPath', '.githooks']);
 
     if (is_file($root . '/.env.local')) {
         io()->note('.env.local already exists, left untouched.');

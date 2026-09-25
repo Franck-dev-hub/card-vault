@@ -2,8 +2,6 @@
 name: Feature request
 about: Propose a feature or an improvement
 title: '[Feature] '
-labels: ''
-assignees: ''
 
 ---
 

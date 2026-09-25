@@ -2,8 +2,6 @@
 name: Bug report
 about: Report incorrect behaviour
 title: '[Fix] '
-labels: bug
-assignees: ''
 
 ---
 

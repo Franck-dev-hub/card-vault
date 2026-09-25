@@ -1,6 +1,6 @@
 # User guide
 
-Card Vault keeps your trading card collections, from several games, in one place.
+Card Vault keeps your trading cards, from several games, in one vault.
 
 The web interface does not exist yet, so the flows below describe the target experience.\
 See the [roadmap](../contributing/roadmap.md) for what lands when.
@@ -25,7 +25,7 @@ Scanning currently supports Pokémon cards.
 
 - View all collected cards.
 - Update or remove items.
-- See recent additions and collection statistics on the dashboard.
+- See recent additions and vault statistics on the dashboard.
 
 ## Games supported
 

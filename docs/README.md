@@ -1,5 +1,10 @@
 # Card Vault documentation
 
+## Project
+
+- [Glossary](../CONTEXT.md)
+- [Decisions (ADR)](adr/)
+
 ## Getting started
 
 - [Installation](getting-started/installation.md)
@@ -13,7 +18,7 @@
 - [Frontend](architecture/frontend.md)
 - [ML](architecture/ml.md)
 - [Proxy](architecture/proxy.md)
-- [Add a card game (licence)](architecture/tcg-integration.md)
+- [Add a game](architecture/tcg-integration.md)
 
 ## Contributing
 

@@ -8,7 +8,8 @@ Card Vault is a monorepo: Caddy proxy, Symfony API, Angular frontend and FastAPI
 1. Run the dev stack: [installation](docs/getting-started/installation.md).
 2. Read the [architecture overview](docs/architecture/overview.md) before touching code.
 
-The [roadmap](docs/contributing/roadmap.md) shows what is planned.
+The [roadmap](docs/contributing/roadmap.md) shows what is planned.\
+The [glossary](CONTEXT.md) sets the words to use, and [docs/adr](docs/adr/) explains the decisions that look surprising.
 
 ## Branches and commits
 

@@ -2,14 +2,16 @@ import numpy as np
 
 class Index:
     def __init__(self, d: int) -> None: ...
-    
+
     def add(self, x: np.ndarray) -> None: ...
-    
-    def search(self, x: np.ndarray, k: int) -> tuple[np.ndarray, np.ndarray]: ...
-    
+
+    def search(
+        self, x: np.ndarray, k: int
+    ) -> tuple[np.ndarray, np.ndarray]: ...
+
     @property
     def ntotal(self) -> int: ...
-    
+
     @property
     def d(self) -> int: ...
 

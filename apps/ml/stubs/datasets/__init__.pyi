@@ -2,7 +2,7 @@ from typing import Any, Iterator
 
 class Dataset:
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
-    
+
     @staticmethod
     def from_generator(
         generator: Iterator[dict[str, Any]],
@@ -10,15 +10,17 @@ class Dataset:
         *args: Any,
         **kwargs: Any
     ) -> Dataset: ...
-    
+
     def push_to_hub(
         self,
         repo_id: str,
         *args: Any,
         **kwargs: Any
     ) -> None: ...
-    
-    def iter(self, batch_size: int = 1, *args: Any, **kwargs: Any) -> Iterator[dict[str, Any]]: ...
+
+    def iter(
+        self, batch_size: int = 1, *args: Any, **kwargs: Any
+    ) -> Iterator[dict[str, Any]]: ...
 
 
 class Features:

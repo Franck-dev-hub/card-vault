@@ -11,7 +11,10 @@ use function Castor\fs;
 use function Castor\io;
 use function Castor\run;
 
-#[AsTask(name: 'env', description: 'Generate the gitignored .env.local with random dev secrets and enable the git hooks')]
+#[AsTask(
+    name: 'env',
+    description: 'Generate the gitignored .env.local with random dev secrets and enable the git hooks',
+)]
 function env(): void
 {
     $root = \dirname(__DIR__);

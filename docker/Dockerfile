@@ -99,7 +99,7 @@ RUN rm -rf /usr/local/bin/yarn /usr/local/bin/yarnpkg && corepack enable
 RUN mkdir -p /home/${USER}/.composer && chown ${USER_ID}:${GROUP_ID} /home/${USER}/.composer
 
 RUN echo 'alias ll="ls -alFh"' >> /home/${USER}/.bashrc \
-      && echo 'alias sf="bin/console"' >> /home/${USER}/.bashrc
+    && echo 'alias sf="bin/console"' >> /home/${USER}/.bashrc
 
 COPY --link docker/php/php.dev.ini $PHP_INI_DIR/conf.d/dev.ini
 

@@ -18,7 +18,12 @@ function phpunit(): void
     \exec_in(\App::Backend, ['php', 'bin/phpunit', ...$options]);
 }
 
-#[AsTask(name: 'infection', namespace: 'tests:backend', description: 'Run mutation testing (Infection)', aliases: ['infection'])]
+#[AsTask(
+    name: 'infection',
+    namespace: 'tests:backend',
+    description: 'Run mutation testing (Infection)',
+    aliases: ['infection'],
+)]
 function infection(
     #[AsOption(description: 'CI only: mutate lines changed since this git ref, e.g. origin/develop')]
     ?string $diffBase = null,

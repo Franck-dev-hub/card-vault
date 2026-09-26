@@ -1,22 +1,18 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+**Do not open a public issue.**
 
-Security fixes are only applied to the latest code on `main`, which is what runs in production at [card-vault.fr](https://card-vault.fr).
+Report it through a
+[private security advisory](https://github.com/Franck-dev-hub/card-vault/security/advisories/new),
+using this template:
 
-| Version                          | Supported          |
-| -------------------------------- | ------------------ |
-| `main` (production)              | :white_check_mark: |
-| Older commits / forks / branches | :x:                |
+```
+Summary:      one line
+Impact:       what an attacker can do
+Component:    route, service or file
+Reproduction: steps or proof of concept
+```
 
-## Reporting a Vulnerability
-
-Open a [private security advisory](https://github.com/Franck-dev-hub/card-vault/security/advisories/new) via the Security tab on this repo.
-
-### What to expect
-- A status update once the issue has been triaged, including whether it's accepted and a rough timeline for a fix.
-- Credit in the fix's release notes if you'd like, once resolved.
-
-### Scope
-This applies to the CardVault codebase in this repository and the production instance at card-vault.fr.
-There is no bug bounty program at this time.
+Only the latest `prod` is patched.\
+Upstream services (TCGdex, Scryfall, Hugging Face) and dependencies are out of
+scope: report them upstream.

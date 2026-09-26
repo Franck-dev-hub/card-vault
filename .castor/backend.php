@@ -10,7 +10,10 @@ use Castor\Attribute\AsTask;
 #[AsTask(name: 'migrate', description: 'Apply pending Doctrine migrations')]
 function migrate(): void
 {
-    \exec_in(\App::Backend, ['bin/console', 'doctrine:migrations:migrate', '--no-interaction', '--all-or-nothing', '--allow-no-migration']);
+    \exec_in(\App::Backend, [
+        'bin/console', 'doctrine:migrations:migrate',
+        '--no-interaction', '--all-or-nothing', '--allow-no-migration',
+    ]);
 }
 
 #[AsTask(name: 'migrate-diff', description: 'Generate a migration from entity changes')]

@@ -1,43 +1,42 @@
-; top-most EditorConfig file
+# Single source of truth: a nested file with `root = true` would silently drop these rules.
 root = true
 
-; Unix-style newlines
 [*]
 charset = utf-8
-end_of_line = LF
+end_of_line = lf
+indent_style = space
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{php,html,twig}]
-indent_style = space
-indent_size = 4
-
 [*.md]
+indent_size = unset
 max_line_length = 80
 
+[*.php]
+max_line_length = 120
+
+[*.{py,pyi}]
+max_line_length = 79
+
+[*.{yaml,yml}]
+indent_size = 2
+
+[apps/api/**.{yaml,yml}]
+indent_size = 4
+
 [*.json]
-indent_style = space
 indent_size = 2
 
-[*.feature]
-indent_style = space
+[apps/api/{composer.json,infection.json5}]
+indent_size = 4
+
+[apps/frontend/{**.{ts,js,html,scss,css,json},.prettierrc}]
 indent_size = 2
+max_line_length = 100
 
-[composer.json]
-indent_style = space
-indent_size = 4
+[apps/frontend/**.{ts,js}]
+quote_type = single
 
-[package.json]
-indent_style = space
-indent_size = 2
-
-[phpstan.neon]
-indent_style = space
-indent_size = 4
-
-[phpunit.xml{,.dist}]
-indent_style = space
-indent_size = 4
-
-[{*.,}Caddyfile]
+[*Caddyfile]
 indent_style = tab

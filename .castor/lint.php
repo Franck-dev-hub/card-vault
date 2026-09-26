@@ -16,7 +16,12 @@ function composer(): void
     \exec_in(\App::Backend, ['composer', 'validate']);
 }
 
-#[AsTask(name: 'phpstan', namespace: 'lint:backend', description: 'Analyse PHP code with PHPStan', aliases: ['phpstan'])]
+#[AsTask(
+    name: 'phpstan',
+    namespace: 'lint:backend',
+    description: 'Analyse PHP code with PHPStan',
+    aliases: ['phpstan'],
+)]
 function phpstan(): void
 {
     io()->section('PHPStan');

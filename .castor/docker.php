@@ -47,7 +47,10 @@ function terminal(
     #[AsArgument(description: 'Service to enter', autocomplete: SERVICES)]
     string $service = 'api',
 ): void {
-    \docker_compose(['exec', $service, 'sh', '-c', 'command -v bash >/dev/null && exec bash; exec sh'], context()->withTty()->withAllowFailure());
+    \docker_compose(
+        ['exec', $service, 'sh', '-c', 'command -v bash >/dev/null && exec bash; exec sh'],
+        context()->withTty()->withAllowFailure(),
+    );
 }
 
 function display_urls(): void

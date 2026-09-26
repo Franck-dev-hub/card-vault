@@ -1,7 +1,7 @@
 # Proxy architecture
 
-Caddy is the single entry point and terminates TLS. The FrankenPHP container
-embeds its own Caddy on port 8000.
+Caddy is the single entry point and terminates TLS.\
+The FrankenPHP container embeds its own Caddy on port 8000.
 
 ## Routing (`docker/caddy/proxy.Caddyfile`)
 
@@ -13,16 +13,16 @@ embeds its own Caddy on port 8000.
 | `/`          | frontend (Angular) | 80, 4200 in dev |
 
 The ML service is internal: only the backend reaches it, at `http://ml:5000` on
-the Docker network. The explicit 404 stops `/ml/*` from falling through to the
-Angular SPA, which would answer 200.
+the Docker network.\
+The explicit 404 stops `/ml/*` from falling through to the Angular SPA, which
+would answer 200.
 
 Security headers on every response: `X-Content-Type-Options`, `X-Frame-Options`,
-`Referrer-Policy`, `Strict-Transport-Security`.
+`Referrer-Policy`, `Strict-Transport-Security`.\
+The dev proxy (`proxy.dev.Caddyfile`, HTTP only) sets the first two.
 
-Everything is served from one origin, so CORS never applies and nothing sets
-`Access-Control-*` headers. Moving the frontend to its own origin would mean
-adding that layer, with an exact origin and `Allow-Credentials` for the session
-cookie.
+Everything is served from one origin, so nothing sets `Access-Control-*`
+headers: see [ADR 0003](../adr/0003-internal-ml-single-origin.md).
 
 ## Dev overlay
 

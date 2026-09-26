@@ -21,10 +21,8 @@ Security headers on every response: `X-Content-Type-Options`, `X-Frame-Options`,
 `Referrer-Policy`, `Strict-Transport-Security`.\
 The dev proxy (`proxy.dev.Caddyfile`, HTTP only) sets the first two.
 
-Everything is served from one origin, so CORS never applies and nothing sets
-`Access-Control-*` headers.\
-Moving the frontend to its own origin would mean adding that layer, with an
-exact origin and `Allow-Credentials` for the session cookie.
+Everything is served from one origin, so nothing sets `Access-Control-*`
+headers: see [ADR 0003](../adr/0003-internal-ml-single-origin.md).
 
 ## Dev overlay
 

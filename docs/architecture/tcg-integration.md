@@ -1,8 +1,9 @@
 # Add a game
 
-Card data is fetched live from third-party databases, nothing is stored.\
-The code still calls a game a licence (`Licence`, `/api/licence`); a rename is
-planned.
+Card data comes from the sources and is cached, never stored: see
+[ADR 0004](../adr/0004-live-card-data.md).\
+The code still calls a game a licence (`Licence`, `/api/licence`); #7 renames
+it.
 
 ```
 request → API Platform operation (#[ApiResource] on the DTO)

@@ -4,11 +4,12 @@ status: accepted
 
 # Translate the frontend at build time, one build per language
 
-The frontend uses `@angular/localize`: each language is a separate, already
-translated build, served under its own path (`/fr/`, `/en/`).\
-It is part of Angular and costs nothing at runtime, and per-language URLs are
-what prerendering and `hreflang` need.\
-Switching language loads the other build, so it reloads the page.
+The frontend is translated when it is built, with `@angular/localize`: each
+language is a complete site of its own, served under its own path (`/fr/`,
+`/en/`).\
+It is part of Angular and adds nothing for the visitor to download, and search
+engines can only index each language if it has its own URL.\
+Switching language opens the other site, so the page reloads.
 
 ## Considered options
 

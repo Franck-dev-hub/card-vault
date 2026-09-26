@@ -1,8 +1,13 @@
+---
+status: accepted
+---
+
 # Keep the ML service internal, serve everything from one origin
 
-The ML service publishes no port and the public proxy answers 404 on `/ml/*`;
-only the API calls it, on the Docker network.\
-The frontend and the API share one origin behind Caddy, so the browser never
-makes a cross-origin call and there is no CORS layer.\
-Moving the frontend to its own origin would mean adding CORS back, with an exact
-origin and credentials for the session cookie.
+Only the API can reach the ML service: it has no public port, and the proxy
+answers 404 on `/ml/*`.\
+Every scan therefore goes through the API's authentication and rate limiting.\
+The frontend and the API are served from the same domain, so the browser never
+calls another domain and no CORS setup is needed.\
+Serving the frontend from its own domain would mean adding CORS back, allowing
+exactly that domain and the session cookie.

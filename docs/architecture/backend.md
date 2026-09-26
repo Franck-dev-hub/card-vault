@@ -46,7 +46,8 @@ Layout under `apps/api/src/`:
 
 Not implemented yet.\
 The intended model is session-cookie authentication (`SESSION_LIFETIME` is
-already configured in the environment), no JWT.\
+already configured in the environment), no JWT: see
+[ADR 0005](../adr/0005-session-cookie-auth.md).\
 Permissions planned via Symfony Voters.
 
 ## Cache and sessions
@@ -56,9 +57,7 @@ Permissions planned via Symfony Voters.
 | `redis-cache`   | `cache.api` pool, Doctrine result cache in prod | none        | `allkeys-lru` |
 | `redis-session` | PHP sessions                                    | AOF         | `noeviction`  |
 
-Two instances, not one with two databases: `maxmemory` is a property of the
-process, so a single instance cannot both evict cache entries under pressure and
-never evict sessions.
+Why two instances: [ADR 0001](../adr/0001-two-redis-instances.md).
 
 Inject the pool as `CacheInterface $cacheApi`, default lifetime 7 days.\
 Clear it with `cache:pool:clear cache.api`; in `prod` that also clears the

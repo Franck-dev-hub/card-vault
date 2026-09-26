@@ -57,7 +57,8 @@ Pokémon only for now.
    Handlers are `def` (FastAPI threadpool), never blocking async handlers for
    CPU-bound inference.
 
-No training: DINOv2 is used as is, as an embedding model.
+No training: DINOv2 is used as is, as an embedding model, see
+[ADR 0002](../adr/0002-card-recognition-by-similarity.md).
 
 ## Dependencies
 

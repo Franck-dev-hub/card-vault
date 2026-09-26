@@ -3,11 +3,11 @@
 The code is open source under AGPL-3.0, and the
 [trademark policy](../../TRADEMARK.md) keeps the Card Vault name and logo out of
 that licence.\
-The AGPL is the only common open source licence that makes a hosted, modified
-copy publish its code; the trademark policy stops that copy from passing itself
-off as Card Vault.\
-No open source licence can forbid other deployments: that would take a
-source-available licence, and the project would stop being open source.
+Anyone may run their own copy, but under the AGPL, whoever runs a modified copy
+as an online service must publish their changes; the trademark policy stops
+that copy from using the Card Vault name.\
+No open source licence can forbid running other copies: that would take a
+licence that is not open source.
 
 ## Considered options
 

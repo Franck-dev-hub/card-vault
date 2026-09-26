@@ -17,12 +17,12 @@ tickets.
 |-----------|--------------------------------------------------------|---------|
 | V0.1      | Backend foundation: Doctrine, migrations, API Platform | done    |
 | V0.2      | Catalogue read path, split Redis, non-blocking ML      | done    |
-| V0.2.1    | ML closed to the public, dead CORS removed, CI guards  | preprod |
+| V0.2.1    | ML closed to the public, CI guards, rename to Game     | preprod |
 | V0.3      | Register, log in, log out                              | preprod |
 | V0.4      | Browse game, extension, card and its detail            | preprod |
-| V0.5      | Add and remove cards from the vault                    | preprod |
+| V0.5      | Add and remove copies from the vault                   | preprod |
 | V0.6      | Scan a card with the camera                            | preprod |
-| V0.7      | E2E, backups, rate limiting, legal pages, consent      | preprod |
+| V0.7      | E2E, backups, rate limiting, legal, GDPR, Cloudflare   | preprod |
 | V1.0      | Public launch                                          | prod    |
 
 ## Planned
@@ -59,17 +59,18 @@ are not listed here.
 
 ### V1.2: Card details update
 
-- Display card prices
-- Change card language
-- Update card condition (Mint, Near Mint, Excellent, Good, Lightly Played,
-  Played, Poor)
+- Display the market price of cards
+- Change the display language of cards
+- Set the condition of a copy (Mint, Near Mint, Excellent, Good, Lightly
+  Played, Played, Poor) and its print language
 
 ### V1.3: Value update
 
-- Edit a card's purchase price
+- Set the purchase price of a copy
 - Display vault value
 - Display game value
 - Display extension value
+- Display the gain against the purchase price
 
 ### V1.4: Stats, search and community update
 
@@ -118,9 +119,10 @@ are not listed here.
 ### V1.7: Progression update
 
 - Add themes (base colour template)
-- Display vault progression
+- Display a progression bar under each game and extension in the vault
 - Display game progression
 - Display extension progression
+- Three levels: official cards, extended (every card), master (every variant)
 
 ### V1.8: Multi-select update
 

@@ -1,9 +1,12 @@
+---
+status: accepted
+---
+
 # Two Redis instances for cache and sessions
 
-Cache and sessions run in two Redis instances, not in one instance with two
-databases.\
-`maxmemory` and its eviction policy apply to the whole process, so a single
-instance cannot evict cache entries under memory pressure and never evict
-sessions.\
-The cache instance evicts with `allkeys-lru` and persists nothing; the session
-instance never evicts and persists with AOF.
+Cache and sessions live in two separate Redis instances.\
+When memory is full, Redis applies one rule to everything it holds: drop old
+entries, or refuse new ones.\
+The cache must drop old entries; sessions must never be dropped, or users get
+logged out.\
+One instance cannot do both, so each gets its own.

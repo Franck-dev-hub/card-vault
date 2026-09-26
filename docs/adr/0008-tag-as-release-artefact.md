@@ -4,11 +4,12 @@ status: accepted
 
 # Release a tag, not a branch
 
-A `v*` tag builds one image per service, and that same image, identified by its
-digest, is deployed to preprod and then promoted to prod.\
-Preprod and prod are deployment environments, not branches: what runs is
-decided by a digest and a reviewed GitHub Environment, not by a merge.\
-Prod therefore runs the exact bytes that were validated in preprod.
+A version is released by putting a tag on a commit (`v0.3`): the tag builds one
+Docker image per service, and that exact image is deployed to preprod, then to
+prod once approved.\
+Preprod and prod are places the image runs, not branches: moving to prod means
+approving that same image, not merging code.\
+Prod therefore runs the very image that was tested in preprod, byte for byte.
 
 ## Considered options
 
@@ -19,3 +20,5 @@ Prod therefore runs the exact bytes that were validated in preprod.
 
 - Nothing may point at a `prod` or `preprod` branch: badges, docs and CI
   triggers use `develop` or the tags (#64).
+- A fix found in preprod ships as a patch tag `vX.Y.Z`, never as a commit on an
+  environment.

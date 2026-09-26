@@ -27,6 +27,12 @@ session.
 A central HTTP service, configured with `withCredentials` so the session cookie
 goes with every request.
 
+## Translation
+
+One build per language with `@angular/localize`, served under `/fr/` and `/en/`:
+see [ADR 0007](../adr/0007-one-build-per-language.md).\
+Every visible string is marked `i18n` or `$localize`.
+
 ## Design system
 
 Not decided yet.

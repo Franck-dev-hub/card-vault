@@ -1,1 +1,1 @@
-# Package for scraping modules
+"""Scripts that build the card image dataset."""

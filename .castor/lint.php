@@ -89,7 +89,8 @@ function ruff(
 function mypy(): void
 {
     io()->section('mypy');
-    \exec_in(\App::Ml, ['uv', 'run', 'mypy', '.']);
+    // The mypy script runs the base venv's Python, blind to the pytest --with layer.
+    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pytest==9.1.1', 'python', '-m', 'mypy', '.']);
 }
 
 #[AsTask(name: 'python-version', namespace: 'lint:ml', description: 'Check that every file declares the same Python version')]

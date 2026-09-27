@@ -1,17 +1,27 @@
+"""Magic card images from Scryfall."""
+
+import logging
+import re
+from io import BytesIO
+from typing import TYPE_CHECKING, Any
+
 import requests
 from PIL import Image
-from io import BytesIO
-import re
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # Scryfall Configuration
 BULK_INFO_URL = "https://api.scryfall.com/bulk-data"
 TIMEOUT = 60
 HEADERS = {"User-Agent": "CardVaultScrap/1.0"}
 
+logger = logging.getLogger(__name__)
 
-def fetch_all_cards():
-    # Fetch the list of all cards
-    print("Requesting data from Scryfall")
+
+def fetch_all_cards() -> list[dict[str, Any]]:
+    """Return every Scryfall card, or an empty list on failure."""
+    logger.info("Requesting data from Scryfall")
     try:
         # Get the download URL
         response = requests.get(
@@ -33,15 +43,17 @@ def fetch_all_cards():
         )
         file_response.raise_for_status()
 
-        return file_response.json()
-
-    except Exception as e:
-        print(f"Error fetching bulk data: {e}")
+        cards: list[dict[str, Any]] = file_response.json()
+    except Exception:
+        logger.exception("Error fetching bulk data")
         return []
+    return cards
 
 
-def download_card(card, output_dir):
-    # Download and save a single card
+def download_card(
+    card: dict[str, Any], output_dir: Path
+) -> tuple[bool, str | None]:
+    """Save one card image; return (success, message)."""
     try:
         # Identify the card and prepare file path
         set_code = card.get("set", "unknown").upper()
@@ -76,7 +88,7 @@ def download_card(card, output_dir):
         img_response.raise_for_status()
 
         # Process and Save
-        img = Image.open(BytesIO(img_response.content))
+        img: Image.Image = Image.open(BytesIO(img_response.content))
 
         # Convert to RGB if necessary
         # Removes transparency/alpha channel
@@ -86,8 +98,7 @@ def download_card(card, output_dir):
         # Normalize size to your specific dimensions
         img = img.resize((245, 337), Image.Resampling.LANCZOS)
         img.save(file_path, "WEBP", quality=85)
-
-        return True, None
-
-    except Exception as e:
+    except (requests.RequestException, OSError, ValueError) as e:
         return False, str(e)
+    else:
+        return True, None

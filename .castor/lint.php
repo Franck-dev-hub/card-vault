@@ -82,6 +82,7 @@ function ruff(
     bool $fix = false,
 ): void {
     io()->section('Ruff');
+    \exec_in(\App::Ml, ['uv', 'run', 'ruff', 'format', ...($fix ? [] : ['--check']), '.']);
     \exec_in(\App::Ml, ['uv', 'run', 'ruff', 'check', ...($fix ? ['--fix'] : []), '.']);
 }
 

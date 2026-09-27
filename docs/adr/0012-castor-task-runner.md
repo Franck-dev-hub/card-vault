@@ -7,8 +7,7 @@ status: accepted
 Castor, a PHP task runner, drives the whole monorepo: the API, the frontend and
 the ML service.\
 CI calls the same Castor tasks as developers, so each command has one
-definition and `castor ci` runs what GitHub Actions runs, except the Docker
-image builds.\
+definition and `castor ci` runs what GitHub Actions runs.\
 On a developer machine Castor runs commands inside the Docker stack; in CI it
 runs them directly in the job's image, and it refuses to start Docker there.
 

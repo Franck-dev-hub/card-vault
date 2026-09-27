@@ -13,17 +13,24 @@ later one, so they can be taken in order.\
 The next thing to work on is always the lowest milestone still holding open
 tickets.
 
-| Milestone | Delivers                                               | Target  |
-|-----------|--------------------------------------------------------|---------|
-| V0.1      | Backend foundation: Doctrine, migrations, API Platform | done    |
-| V0.2      | Catalogue read path, split Redis, non-blocking ML      | done    |
-| V0.2.1    | ML closed to the public, CI guards, rename to Game     | preprod |
-| V0.3      | Register, log in, log out                              | preprod |
-| V0.4      | Browse game, extension, card and its detail            | preprod |
-| V0.5      | Add and remove copies from the vault                   | preprod |
-| V0.6      | Scan a card with the camera                            | preprod |
-| V0.7      | E2E, backups, rate limiting, legal, GDPR, Cloudflare   | preprod |
-| V1.0      | Public launch                                          | prod    |
+| Milestone | Delivers                                                   | Target  |
+|-----------|------------------------------------------------------------|---------|
+| V0.1      | Backend foundation: Doctrine, migrations, API Platform     | done    |
+| V0.2      | Catalogue read path, split Redis, non-blocking ML          | done    |
+| V0.2.1    | ML closed to the public, ML tooling, rename to Game        | preprod |
+| V0.2.2    | Dependency tracking: Renovate, actions pinned by SHA       | preprod |
+| V0.2.3    | One image per tag, CI guards: Hadolint, Trivy, Doctrine    | preprod |
+| V0.2.4    | Continuous preprod: front proxy, secrets, auto deploy      | preprod |
+| V0.3      | Register, log in, log out                                  | preprod |
+| V0.4      | Browse game, extension, card and its detail                | preprod |
+| V0.5      | Add and remove copies from the vault                       | preprod |
+| V0.6      | Scan a card with the camera                                | preprod |
+| V0.7      | Operations: backups, Sentry, logs, alerts                  | preprod |
+| V0.8      | Cloudflare: proxy, zone, Access, real IP, maintenance page | preprod |
+| V0.9      | Abuse protection: global rate limit, Turnstile             | preprod |
+| V0.10     | Legal, GDPR, consent, Matomo                               | preprod |
+| V0.11     | Quality and performance: E2E, SEO, Lighthouse, k6          | preprod |
+| V1.0      | Public launch                                              | prod    |
 
 ## Planned
 
@@ -110,7 +117,7 @@ are not listed here.
     - Change cards view (rows or grid)
     - Implement dark mode
 - Account
-    - Delete the account (never used, but kept just in case)
+    - Delete the account
     - Change username
     - Change currency
     - Change password

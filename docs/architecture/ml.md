@@ -2,7 +2,7 @@
 
 ## Stack
 
-Python 3.12, FastAPI, PyTorch, Hugging Face Transformers (DINOv2), FAISS.\
+Python, FastAPI, PyTorch, Hugging Face Transformers (DINOv2), FAISS.\
 Dependencies are managed with uv (`pyproject.toml` + `uv.lock`) in the image
 build.
 
@@ -21,7 +21,7 @@ Only the backend calls it, at `http://ml:5000` on the Docker network; the
 |--------|----------------------|-----------------------|
 | GET    | `/ml/health`         | Liveness check        |
 | POST   | `/ml/api/v1/predict` | Match a card image    |
-| GET    | `/ml/api/v1/docs`    | OpenAPI documentation |
+| GET    | `/api/v1/docs`       | OpenAPI documentation |
 
 `predict` takes `{"image": "<base64>"}`, a data URL prefix is accepted, 2 MB
 max.\
@@ -59,9 +59,3 @@ Pokémon only for now.
 
 No training: DINOv2 is used as is, as an embedding model, see
 [ADR 0002](../adr/0002-card-recognition-by-similarity.md).
-
-## Dependencies
-
-Installed at build time in `docker/ml/Dockerfile`.\
-The Hugging Face cache is a named volume; `HF_TOKEN` is required on first run to
-download the model.

@@ -17,26 +17,14 @@ no registry and no routing.
 
 ## Endpoints
 
-| Endpoint                                           | Returns                 |
-|----------------------------------------------------|-------------------------|
-| `GET /api/licence`                                 | List of supported games |
-| `GET /api/licence/{slug}/extensions`               | Extensions of a game    |
-| `GET /api/licence/{slug}/extensions/{setId}/cards` | Cards of an extension   |
-| `GET /api/licence/{slug}/cards/{cardId}`           | A single card           |
-
+Listed in the [backend doc](backend.md#endpoints).\
 JSON-LD by default, plain JSON through content negotiation.
 
 ## DTOs
 
 Plain readonly classes in `apps/api/src/Service/Licence/Dto/`, no Doctrine
-mapping, identical across games so the frontend never branches on the game.
-
-| DTO         | Fields                                                                                                                                                                                             |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Licence`   | `slug`, `name`, read from `apps/api/resources/licences.json`                                                                                                                                       |
-| `Extension` | `id` (the upstream set code), `name`, `totalCards`                                                                                                                                                 |
-| `Card`      | `licence`, `cardId`, `cardNumber`, `cardName`, `extensionId`, `extensionName`, `illustrator`, `rarity`, `cardImage`, `variant` (`string[]`), `prices` (`array<string, PriceSet>` keyed by variant) |
-| `PriceSet`  | `avg`, `low`, `trend`, in EUR                                                                                                                                                                      |
+mapping, identical across games so the frontend never branches on the game.\
+Their fields are in the OpenAPI documentation.
 
 `cardId` is prefixed (`pokemon-base1-1`, `magic-{uuid}`) to stay unique across
 games.\
@@ -86,13 +74,12 @@ public function getCard(string $cardId): Card;         // upstream ids are self-
    plain HTTP source (`scryfall.client`, injected as `$scryfallClient`), or a
    factory for an SDK (`TcgdexFactory`).
 4. Add the game to `apps/api/resources/licences.json`.
-5. Update the supported-games table in the [user guide](../user-guide/usage.md).
+5. Update the games table in the [README](../../README.md#features).
 
 Routes, serialisation and OpenAPI documentation come from the shared providers.
 
 Test the normaliser against a payload captured upstream, and the client with
-`MockHttpClient`: nominal case, upstream 404, upstream 5xx.\
-See the [testing conventions](../../CONTRIBUTING.md#code).
+`MockHttpClient`: nominal case, upstream 404, upstream 5xx.
 
 ## Sources
 

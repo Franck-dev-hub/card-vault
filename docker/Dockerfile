@@ -4,6 +4,10 @@ ARG COMPOSER_VERSION=2.9
 ARG NODEJS_VERSION=22
 ARG PHP_EXTENSION_INSTALLER_VERSION=2
 ARG CASTOR_VERSION=1.7.0
+ARG PHP_EXTENSIONS="intl opcache apcu pdo_pgsql redis sodium"
+ARG USER=cardvault
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 FROM composer/composer:${COMPOSER_VERSION} AS composer
 
@@ -160,7 +164,8 @@ COPY apps/api/composer.json apps/api/composer.lock* ./
 RUN composer install --no-ansi --no-progress --no-interaction --no-scripts --no-dev --no-autoloader
 
 # 2. Copy full source, finalize autoloader
-COPY apps/api ./
+# Root-owned by default, then assets:install cannot create public/bundles.
+COPY --chown=${USER_ID}:${GROUP_ID} apps/api ./
 
 RUN <<-EOF
     set -eux
@@ -168,7 +173,7 @@ RUN <<-EOF
     composer dump-autoload --optimize --apcu --no-interaction --no-dev
 EOF
 
-RUN composer run-script --no-interaction post-install-cmd || true
+RUN composer run-script --no-interaction post-install-cmd
 
 # Strip vendor dev files to reduce image size (only safe patterns)
 RUN find vendor -type d -name ".git" -exec rm -rf {} + 2>/dev/null || true \
@@ -182,7 +187,6 @@ FROM scratch AS app_sources
 ARG USER
 ARG USER_ID
 ARG GROUP_ID
-ARG RELEASE_APP_CONFIG_ENV=prod
 
 COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/bin /sources/bin
 COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/config /sources/config
@@ -193,6 +197,8 @@ COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api
 COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/vendor /sources/vendor
 COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/composer.json /sources/composer.json
 COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/composer.lock /sources/composer.lock
+COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/.env /sources/.env
+COPY --from=app_builder --chown=${USER_ID}:${GROUP_ID} /home/${USER}/sources/api/resources /sources/resources
 
 COPY --chmod=755 docker/share/docker-entrypoint-share.sh /share/docker-entrypoint-share.sh
 
@@ -205,9 +211,8 @@ ARG USER
 ARG USER_ID
 ARG GROUP_ID
 ARG RELEASE_VERSION
-ARG RELEASE_APP_CONFIG_ENV=prod
 
-ENV APP_CONFIG_ENV=$RELEASE_APP_CONFIG_ENV
+ENV APP_ENV=prod
 ENV APP_DEBUG=0
 ENV CONTAINER_USER=${USER}
 ENV CADDY_GLOBAL_LOG_LEVEL=warn
@@ -238,8 +243,8 @@ USER ${USER}
 
 RUN <<-EOF
     set -eux
-    APP_ENV=prod php bin/console cache:warmup
-    APP_ENV=prod php bin/console lint:container
+    php bin/console cache:warmup
+    php bin/console lint:container
 EOF
 
 ENTRYPOINT ["docker-entrypoint"]
@@ -255,9 +260,8 @@ ARG USER
 ARG USER_ID
 ARG GROUP_ID
 ARG RELEASE_VERSION
-ARG RELEASE_APP_CONFIG_ENV=prod
 
-ENV APP_CONFIG_ENV=$RELEASE_APP_CONFIG_ENV
+ENV APP_ENV=prod
 ENV APP_DEBUG=0
 ENV CONTAINER_USER=${USER}
 

@@ -46,7 +46,8 @@ search.
 
 ### `castor ci` fails while lint/tests pass individually
 
-`castor ci` runs lint plus security audits plus all three test suites.\
+`castor ci` runs lint, security audits, the three test suites and the image
+builds.\
 The security steps (`pnpm audit`, `composer audit`, `pip-audit`) find issues
 that lint and tests do not.\
 Read the failing step's output and fix the dependency or the code it flags.

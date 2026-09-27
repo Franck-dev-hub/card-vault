@@ -6,7 +6,9 @@ namespace ci;
 
 use Castor\Attribute\AsTask;
 
+use function Castor\capture;
 use function Castor\io;
+use function Castor\run;
 
 #[AsTask(name: 'backend', description: 'Run the backend CI checks: lint, security, PHPUnit, Infection')]
 function backend(): void
@@ -39,10 +41,40 @@ function ml(): void
     io()->success('ML CI checks passed.');
 }
 
-#[AsTask(name: 'all', description: 'Run every CI check (no E2E)', aliases: ['ci'])]
+const IMAGES = [
+    'api' => ['docker/Dockerfile', 'frankenphp_release'],
+    'frontend' => ['docker/frontend/Dockerfile', null],
+];
+
+#[AsTask(name: 'docker', description: 'Build the release images from the git tree, as the CI does')]
+function docker(): void
+{
+    if (\Runtime::Host !== \runtime()) {
+        throw new \RuntimeException('This task builds Docker images: run it on the host.');
+    }
+
+    // The CI checkout has no gitignored files; a local context can hide a broken build.
+    $tree = trim(capture(['git', 'stash', 'create'])) ?: 'HEAD';
+
+    foreach (IMAGES as $name => [$file, $target]) {
+        io()->section('Docker build (' . $name . ')');
+        run(\sprintf(
+            'git archive %s | docker build -f %s%s -t card-vault/%s:local -',
+            $tree,
+            $file,
+            null === $target ? '' : ' --target ' . $target,
+            $name,
+        ));
+    }
+
+    io()->success('Docker images built.');
+}
+
+#[AsTask(name: 'all', description: 'Run every CI check (no E2E), Docker builds included', aliases: ['ci'])]
 function all(): void
 {
     frontend();
     ml();
     backend();
+    docker();
 }

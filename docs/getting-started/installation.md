@@ -53,18 +53,19 @@ App tasks run inside the dev containers, so the stack must be up.
 ## Tests and lint
 
 ```bash
-castor lint                  # lint all stacks
-castor lint --fix            # auto-fix what can be, then lint
-castor lint:backend          # one stack: backend, frontend, ml
-castor lint:backend:phpstan  # one tool, named after its stack
-castor security:all          # dependency audits
-castor tests:backend         # PHPUnit
-castor tests:frontend        # Vitest
-castor tests:ml              # pytest
-castor tests:e2e             # Playwright
-castor tests:backend:infection  # Infection mutation testing
-castor ci:backend            # one stack's CI checks
-castor ci                    # every stack; Infection runs on the whole tree
+castor lint                    # lint all stacks
+castor lint --fix              # auto-fix what can be, then lint
+castor lint:backend            # one stack: backend, frontend, ml
+castor lint:backend:phpstan    # one tool, named after its stack
+castor security:all            # dependency audits
+castor tests:backend           # PHPUnit
+castor tests:frontend          # Vitest
+castor tests:ml                # pytest
+castor tests:e2e               # Playwright
+castor tests:backend:infection # Infection mutation testing
+castor ci:backend              # one stack's CI checks
+castor ci:docker               # release images, built from the git tree
+castor ci                      # every stack; Infection runs on the whole tree
 ```
 
 ## Managing dependencies

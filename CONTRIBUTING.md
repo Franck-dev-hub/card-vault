@@ -29,7 +29,7 @@ Commit messages look like this:
   `Style`, `Release`.
 - Start with a verb, stay under 70 characters, and say what changed rather than
   how.
-- Skip the issue ID only for untracked work, like chores or spikes.
+- Skip the issue ID only for untracked work, like quick maintenance or spikes.
 
 ## Language
 

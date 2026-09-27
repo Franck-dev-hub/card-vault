@@ -3,7 +3,7 @@ name = "ml-service"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = "==3.14.*"
 dependencies = [
     "bandit>=1.8.0",
     "datasets>=4.5.0",
@@ -11,8 +11,7 @@ dependencies = [
     "fastapi>=0.128.0",
     "flake8>=7.3.0",
     "mypy>=2.3.0",
-    "numpy>=1.26.4,<2.0.0",
-    "pandas>=2.1.1,<2.2.0",
+    "numpy>=2.5.3",
     "ruff>=0.15.21,<0.16",
     "torchvision>=0.24.1",
     "transformers>=4.57.6",

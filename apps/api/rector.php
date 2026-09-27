@@ -9,6 +9,7 @@ use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonySetList;
 
 return static function (RectorConfig $rectorConfig): void {
+    // No importNames(): php-cs-fixer @Symfony undoes it and the two loop forever
     $rectorConfig->removeUnusedImports();
 
     $rectorConfig->paths([

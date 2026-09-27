@@ -58,7 +58,7 @@ Commit messages look like this:
 ## Before opening a pull request
 
 - `castor ci` passes.\
-  GitHub Actions runs the same checks.
+  GitHub Actions runs the same checks, plus the Docker image builds.
 - If you added or changed an endpoint, module or component, update its
   architecture doc in the same pull request (see the
   [docs index](docs/README.md)).

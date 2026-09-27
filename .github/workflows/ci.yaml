@@ -113,6 +113,37 @@ jobs:
       - name: Tests
         run: castor tests:ml
 
+  docker:
+    name: Docker build (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            file: docker/Dockerfile
+            target: frankenphp_release
+          - name: frontend
+            file: docker/frontend/Dockerfile
+            target: ""
+    steps:
+      - uses: actions/checkout@v4
+
+      # The default docker driver cannot export the gha cache.
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.file }}
+          target: ${{ matrix.target }}
+          push: false
+          # Scoped per image, or both entries overwrite the same cache.
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest

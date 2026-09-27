@@ -45,8 +45,7 @@ Layout under `apps/api/src/`:
 ## Security and authentication
 
 Not implemented yet.\
-The intended model is session-cookie authentication (`SESSION_LIFETIME` is
-already configured in the environment), no JWT: see
+The intended model is session-cookie authentication, no JWT: see
 [ADR 0005](../adr/0005-session-cookie-auth.md).\
 Permissions planned via Symfony Voters.
 
@@ -59,7 +58,7 @@ Permissions planned via Symfony Voters.
 
 Why two instances: [ADR 0001](../adr/0001-two-redis-instances.md).
 
-Inject the pool as `CacheInterface $cacheApi`, default lifetime 7 days.\
+Inject the pool as `CacheInterface $cacheApi`.\
 Clear it with `cache:pool:clear cache.api`; in `prod` that also clears the
 Doctrine result cache.\
 Sessions live in the other instance and survive even a `FLUSHDB`.
@@ -67,16 +66,6 @@ Sessions live in the other instance and survive even a `FLUSHDB`.
 ## Database
 
 PostgreSQL, migrations with Doctrine Migrations, no fixtures yet.
-
-| Table  | Entity | Holds         |
-|--------|--------|---------------|
-| `user` | `User` | `id`, `email` |
-
-## Custom CLI commands
-
-None yet.\
-The `castor backend:migrate` and `castor backend:migrate-diff` tasks call the
-standard Doctrine commands.
 
 ## Adding a card game
 

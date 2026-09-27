@@ -82,6 +82,7 @@ function ruff(
     bool $fix = false,
 ): void {
     io()->section('Ruff');
+    \exec_in(\App::Ml, ['uv', 'run', 'ruff', 'format', ...($fix ? [] : ['--check']), '.']);
     \exec_in(\App::Ml, ['uv', 'run', 'ruff', 'check', ...($fix ? ['--fix'] : []), '.']);
 }
 
@@ -89,7 +90,50 @@ function ruff(
 function mypy(): void
 {
     io()->section('mypy');
-    \exec_in(\App::Ml, ['uv', 'run', 'mypy', '.']);
+    // The mypy script runs the base venv's Python, blind to the pytest --with layer.
+    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pytest==9.1.1', 'python', '-m', 'mypy', '.']);
+}
+
+#[AsTask(name: 'python-version', namespace: 'lint:ml', description: 'Check that every file declares the same Python version')]
+function python_version(): void
+{
+    io()->section('Python version');
+    $root = \dirname(__DIR__);
+    $versions = [
+        '.env' => read_version($root . '/.env', '/^PYTHON_VERSION=(\S+)$/m'),
+        'apps/ml/pyproject.toml' => read_version($root . '/apps/ml/pyproject.toml', '/^requires-python = "==(\d+\.\d+)\.\*"$/m'),
+        'docker/ml/Dockerfile' => read_version($root . '/docker/ml/Dockerfile', '/^ARG PYTHON_VERSION=(\S+)$/m'),
+    ];
+    // Compose loads .env.local over .env: a stale copy would pin the old version.
+    $local = $root . '/.env.local';
+    if (is_file($local) && null !== $version = read_version($local, '/^PYTHON_VERSION=(\S+)$/m')) {
+        $versions['.env.local'] = $version;
+    }
+
+    assert_same_version($versions);
+    io()->success(\sprintf('Python %s everywhere.', $versions['.env']));
+}
+
+/**
+ * @param array<string, string|null> $versions file => version, null when the pattern is not found
+ */
+function assert_same_version(array $versions): void
+{
+    $unreadable = array_keys($versions, null, true);
+    if ([] !== $unreadable) {
+        throw new \RuntimeException(\sprintf('No Python version found in: %s.', implode(', ', $unreadable)));
+    }
+
+    if (1 !== \count(array_unique($versions))) {
+        $found = array_map(static fn (string $file, string $version): string => "{$file} {$version}", array_keys($versions), $versions);
+
+        throw new \RuntimeException(\sprintf('Python versions differ: %s.', implode(', ', $found)));
+    }
+}
+
+function read_version(string $file, string $pattern): ?string
+{
+    return 1 === preg_match($pattern, (string) file_get_contents($file), $match) ? $match[1] : null;
 }
 
 #[AsTask(name: 'backend', description: 'Run every backend linter')]
@@ -119,6 +163,7 @@ function ml(
     #[AsOption(description: 'Apply the fixes')]
     bool $fix = false,
 ): void {
+    python_version();
     ruff($fix);
     mypy();
 }

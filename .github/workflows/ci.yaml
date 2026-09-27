@@ -92,10 +92,17 @@ jobs:
     name: Machine learning
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    container:
-      image: ghcr.io/astral-sh/uv:python3.12-bookworm-slim
     steps:
       - uses: actions/checkout@v4
+
+      - name: Read the Python version
+        run: grep '^PYTHON_VERSION=' .env >> "$GITHUB_ENV"
+
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          # Multi-GB torch wheels would evict the other jobs' caches.
+          enable-cache: false
 
       - uses: castor-php/setup-castor@v1.1.0
         with:

@@ -8,19 +8,18 @@
 Delete it and re-run `castor setup:env`, which regenerates secrets
 automatically.
 
-### The ML models are not downloading
+### The ML index is not downloading
 
-The ML service needs `HF_TOKEN` on first run.\
-Copy it from your Hugging Face account settings into `.env.local`, then rebuild
-the service with `castor docker:build --service=ml`.\
-The model cache lives in the `ml_hf_cache` volume.
+The ML service needs `HF_TOKEN` on first run: the index sits in a private
+Hugging Face dataset.\
+Copy it from your Hugging Face account settings into `.env.local`, then run
+`castor up`.\
+The index is cached in `apps/ml/app/models/data_cache/`.
 
 ### Ports already in use
 
-The dev stack exposes ports 80, 5432, 6379 (redis-cache), 6380 (redis-session),
-5050, 5540, 8025, 1025.\
-If one is taken, stop the conflicting service or change the host port in
-`docker/compose.dev.yaml`.
+If a port of the dev stack is taken, stop the conflicting service or change its
+host port under `ports:` in `docker/compose.dev.yaml`.
 
 ## Inside the app
 
@@ -44,14 +43,6 @@ search.
 
 ## Development
 
-### `castor ci` fails while lint/tests pass individually
-
-`castor ci` runs lint, security audits, the three test suites and the image
-builds.\
-The security steps (`pnpm audit`, `composer audit`, `pip-audit`) find issues
-that lint and tests do not.\
-Read the failing step's output and fix the dependency or the code it flags.
-
 ### `castor` lists no task
 
 Castor is older than 1.7, the minimum `castor.php` accepts.\
@@ -61,9 +52,3 @@ Upgrade it.
 
 App tasks run inside the dev containers.\
 Start the stack with `castor up`.
-
-## See also
-
-- [Installation](installation.md)
-- [Configuration](configuration.md)
-- [Contributing guidelines](../../CONTRIBUTING.md)

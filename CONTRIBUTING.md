@@ -1,8 +1,6 @@
 # Contributing
 
-Thanks for helping out.\
-Card Vault is a monorepo: Caddy proxy, Symfony API, Angular frontend and FastAPI
-ML service, all run with Docker Compose.
+Thanks for helping out.
 
 ## Getting started
 
@@ -42,18 +40,8 @@ Commit messages look like this:
 - Comments explain why, and only when the code can't.\
   Most code needs none.
 - No `var_dump()`, `dd()` or `dump()`.
-- PHP: Yoda conditions (`null === $x`), PHPStan at max level, PHP CS Fixer.
-- TypeScript: strict mode, ESLint, Vitest, Playwright.
-- Python: ruff, mypy, pytest.
-- Backend: no business logic in controllers, an interface for every external
-  integration, repositories, API Platform DTOs.
-- Frontend: standalone components; features in `src/app/features/`, shared UI in
-  `src/app/shared/`, cross-cutting code in `src/app/core/`; API calls only
-  through services.
-- ML: `def` handlers for CPU-bound inference; model and FAISS index loaded once
-  at startup.
-- Tests: normalisers against a payload captured upstream; HTTP clients with
-  `MockHttpClient` (nominal, upstream 404, upstream 5xx).
+- Each app has its own layout rules: [backend](docs/architecture/backend.md),
+  [frontend](docs/architecture/frontend.md), [ML](docs/architecture/ml.md).
 
 ## Before opening a pull request
 

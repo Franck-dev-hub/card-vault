@@ -1,19 +1,30 @@
-from pathlib import Path
+"""Download every card image to a local folder."""
+
+import logging
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+from typing import Any
+
+from app.log import setup_logging
+
 from . import pokemon_scrap as pokemon_manager
-# from . import magic_scrap as magic_manager
 
 OUTPUT_DIR = Path("images")
 OUTPUT_DIR.mkdir(exist_ok=True)
 MAX_WORKERS = 5
-MANAGERS = [
-    pokemon_manager,
-    # magic_manager
-]
+PROGRESS_EVERY = 100
+MANAGERS = [pokemon_manager]
+
+logger = logging.getLogger(__name__)
+
+type Card = dict[str, Any]
+type Downloader = Callable[[Card, Path], tuple[bool, str | None]]
 
 
-def main():
-    tasks = []
+def main() -> None:
+    """Download the images of every managed game, in parallel."""
+    tasks: list[tuple[Card, Downloader]] = []
     stats = {}
 
     # Loop through all managers
@@ -21,20 +32,19 @@ def main():
         try:
             cards = manager.fetch_all_cards()
             stats[manager.__name__] = len(cards)
-            for card in cards:
-                tasks.append((card, manager.download_card))
-        except Exception as e:
-            print(f"Failed to load manager {manager.__name__}: {e}")
+            tasks.extend((card, manager.download_card) for card in cards)
+        except Exception:
+            logger.exception("Failed to load manager %s", manager.__name__)
 
     total_tasks = len(tasks)
     if total_tasks == 0:
-        print("No cards found or API error.")
+        logger.error("No cards found or API error")
         return
 
     breakdown = ", ".join(
         [f"{name}: {count}" for name, count in stats.items()]
     )
-    print(f"Total cards: {total_tasks} ({breakdown})\n")
+    logger.info("Total cards: %d (%s)", total_tasks, breakdown)
 
     success_count = 0
     skipped_count = 0
@@ -64,26 +74,23 @@ def main():
                     error_count += 1
                     errors_detail[card_data.get("id", index)] = msg
             except Exception as e:
+                logger.exception("Card %s crashed", index)
                 error_count += 1
                 errors_detail[f"Task_{index}"] = str(e)
 
-            # Display progression
             progress = success_count + error_count
-            percentage = (progress / total_tasks) * 100
-            print(
-                f"Progression: {progress}/{total_tasks}({percentage:.1f}%)",
-                end="\r",
-            )
+            if progress % PROGRESS_EVERY == 0 or progress == total_tasks:
+                logger.info("Progress: %d/%d", progress, total_tasks)
 
-    # Result summary
-    print("\n" + "=" * 50)
-    print(f"Total processed => {total_tasks}")
-    print(f" - Success ------> {success_count}")
-    print(f" - Downloaded ---> {success_count - skipped_count}")
-    print(f" - Skipped ------> {skipped_count}")
-    print(f" - Errors -------> {error_count}")
-    print("=" * 50)
+    logger.info(
+        "Processed %d: %d downloaded, %d skipped, %d errors",
+        total_tasks,
+        success_count - skipped_count,
+        skipped_count,
+        error_count,
+    )
 
 
 if __name__ == "__main__":
+    setup_logging()
     main()

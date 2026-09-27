@@ -51,7 +51,6 @@ jobs:
             file: docker/ml/Dockerfile
             target: ""
             args: |
-              PYTHON_VERSION=${{ vars.PYTHON_VERSION || '3.12' }}
               USER=${{ vars.PROJECT_NAME || 'cardvault' }}
               USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}
               GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}

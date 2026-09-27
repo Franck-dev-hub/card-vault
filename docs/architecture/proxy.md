@@ -23,13 +23,3 @@ The dev proxy (`proxy.dev.Caddyfile`, HTTP only) sets the first two.
 
 Everything is served from one origin, so nothing sets `Access-Control-*`
 headers: see [ADR 0003](../adr/0003-internal-ml-single-origin.md).
-
-## Dev overlay
-
-- `docker/compose.yaml`: base stack (caddy, api, frontend, ml, database,
-  redis-cache, redis-session) with healthchecks and `restart: unless-stopped`.
-- `docker/compose.dev.yaml`: dev overlay (hot reload, mailpit, pgadmin,
-  redisinsight).
-- `castor up` starts the dev environment.
-
-TLS and the preprod/prod overlays are managed by the maintainer.

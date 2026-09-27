@@ -24,67 +24,41 @@ Search for a card or point your camera at it, and it lands in your vault.
 
 ---
 
-## Table of contents
-- [Welcome](#welcome)
-- [Features](#features)
-- [Technologies used](#technologies-used)
-- [Installation](#installation)
-- [Contributing and security](#contributing-and-security)
-- [Authors](#authors)
-- [Community](#community)
-
----
-
 ## Features
 
 Status: pre-release.\
 The features below are the V1.0 scope, see the
 [roadmap](docs/contributing/roadmap.md) for what lands when.
 
-| V1.0 scope                                               | Games                                                                                                                         |
-|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| Manually add cards to your vault using search            | ![Pokémon](https://img.shields.io/badge/Pokémon-FFCB05) ![Magic](https://img.shields.io/badge/Magic%20the%20gathering-D02E20) |
-| Add cards to your vault by scanning them with a camera   | ![Pokémon](https://img.shields.io/badge/Pokémon-FFCB05)                                                                       |
+| V1.0 scope                                             | Games                                                                                                                         |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| Manually add cards to your vault using search          | ![Pokémon](https://img.shields.io/badge/Pokémon-FFCB05) ![Magic](https://img.shields.io/badge/Magic%20the%20gathering-D02E20) |
+| Add cards to your vault by scanning them with a camera | ![Pokémon](https://img.shields.io/badge/Pokémon-FFCB05)                                                                       |
 
 ### Upcoming
-- Adding ![Lorcana](https://img.shields.io/badge/Lorcana-E6DBB9)
+
+- More games (planned): ![Lorcana](https://img.shields.io/badge/Lorcana-E6DBB9)
   ![YuGiOh](https://img.shields.io/badge/Yu%20Gi%20Oh!-FFD700)
   ![One Piece](https://img.shields.io/badge/One%20Piece-E74C3C)
   ![Palworld](https://img.shields.io/badge/Palworld-008080)
-- Adding inventory and deck building
-- Adding statistics and vault value estimation
-- Improve core code (codebase, CI/CD, Docker ...)
 
 ---
 
 ## Technologies used
-| Part             | Language / framework                                                                                                                                                                   | Tools                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Tests                                                                                                                                                                                                                                                                                                                                                     |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Backend          | ![Symfony](https://img.shields.io/badge/PHP-Symfony-black?logo=symfony&logoColor=fff&labelColor=777BB3)                                                                                | ![API Platform](https://img.shields.io/badge/API_Platform-6366F1?logo=api-platform&logoColor=white) ![Doctrine](https://img.shields.io/badge/Doctrine-4479A1?logo=doctrine&logoColor=white) ![EasyAdmin](https://img.shields.io/badge/EasyAdmin-1B2A4A?logo=symfony&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                       | ![PHPStan](https://img.shields.io/badge/PHPStan-93C748?logo=php&logoColor=white) ![PHPUnit](https://img.shields.io/badge/PHPUnit-3A4A5C?logo=php&logoColor=white) ![PHP CS Fixer](https://img.shields.io/badge/PHP%20CS%20Fixer-0066C8) ![Rector](https://img.shields.io/badge/Rector-AA2FF3) ![Infection](https://img.shields.io/badge/Infection-D33A2C) |
-| Frontend         | ![Angular](https://img.shields.io/badge/TS-Angular-DD0031?logo=angular&logoColor=fff&labelColor=3178C6)                                                                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white) ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)                                                                                                                                                                           |
-| Machine learning | ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)                                                                                                        | ![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white) ![Hugging Face](https://img.shields.io/badge/Hugging%20Face-FFD21E?logo=huggingface&logoColor=000) ![FAISS](https://img.shields.io/badge/FAISS-4285F4?logo=meta&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                                      |                                                                                                                                                                                                                                                                                                                                                           |
-| Database         | ![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-%23DD0031.svg?logo=redis&logoColor=white) | ![pgAdmin](https://img.shields.io/badge/pgAdmin-316192?logo=postgresql&logoColor=white) ![RedisInsight](https://img.shields.io/badge/RedisInsight-DC382D?logo=redis&logoColor=white) ![Mailpit](https://img.shields.io/badge/Mailpit-3399FF?logo=minutemailer&logoColor=white)                                                                                                                                                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                                                                                                           |
-| DevOps           |                                                                                                                                                                                        | ![Docker Compose](https://img.shields.io/badge/Docker-Compose-gray?logo=docker&logoColor=fff&labelColor=2496ED) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) ![Caddy](https://img.shields.io/badge/Caddy-1F8AC8?logo=caddy&logoColor=white) ![Sentry](https://img.shields.io/badge/Sentry-362D59?logo=sentry&logoColor=white) ![Matomo](https://img.shields.io/badge/Matomo-3152A0?logo=matomo&logoColor=white) ![Tarteaucitron](https://img.shields.io/badge/Tarteaucitron-F7D917?logo=tarteaucitron&logoColor=black) ![FrankenPHP](https://img.shields.io/badge/FrankenPHP-b3d133?logo=php&logoColor=black) |                                                                                                                                                                                                                                                                                                                                                           |
+
+![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)
+![Symfony](https://img.shields.io/badge/Symfony-000000?logo=symfony&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-DD0031?logo=angular&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+
+Full stack in the [architecture overview](docs/architecture/overview.md#stack).
 
 ---
 
 ## Installation
 
-Requires Docker with Docker Compose, [Castor](https://castor.jolicode.com) and
-Git.
-
-```bash
-git clone https://github.com/Franck-dev-hub/card-vault.git
-cd card-vault
-castor setup:env      # generate the gitignored local secrets
-castor docker:build   # build and start the dev stack
-```
-
-The app is then served at http://card-vault.localhost, the API docs at
-http://card-vault.localhost/api/docs.
-
-Full setup, service URLs, test and lint commands:
-[Installation](docs/getting-started/installation.md).
+See [Installation](docs/getting-started/installation.md).
 
 ---
 

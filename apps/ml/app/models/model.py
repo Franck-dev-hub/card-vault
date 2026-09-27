@@ -1,16 +1,21 @@
+"""DINOv2 embeddings and the FAISS index of known cards."""
+
 import io
 import json
+import logging
 import os
 import threading
+from pathlib import Path
+from typing import Any
+
 import faiss
+import numpy as np
 import requests
 import torch
-import numpy as np
-from pathlib import Path
-from PIL import Image
-from transformers import AutoImageProcessor, AutoModel
 from datasets import load_dataset
 from huggingface_hub import hf_hub_download
+from PIL import Image
+from transformers import AutoImageProcessor, AutoModel
 
 # Configuration
 BASE_DIR = Path(__file__).parent.absolute()
@@ -22,47 +27,50 @@ NAMES_FILE = DATA_DIR / "cards_metadata.json"
 BATCH_SIZE = 128
 BACKEND_URL = os.getenv("BACKEND_URL", "http://api:8000")
 
+type CardMatch = dict[str, Any]
+type CardEntry = dict[str, str]
+
+logger = logging.getLogger(__name__)
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-print(f"Loading {MODEL_NAME} on {device}")
-processor = AutoImageProcessor.from_pretrained(  # nosec B615
-    MODEL_NAME, use_fast=True
-)
-model = AutoModel.from_pretrained(MODEL_NAME).to(device)  # nosec B615
+logger.info("Loading %s on %s", MODEL_NAME, device)
+processor = AutoImageProcessor.from_pretrained(MODEL_NAME, use_fast=True)
+model = AutoModel.from_pretrained(MODEL_NAME).to(device)
 model.eval()
 
 
-def build_index():
+def build_index() -> None:
+    """Download the index from HF, or build it from the dataset."""
     try:
-        print("Research index on HF")
-        hf_hub_download(  # nosec B615
+        logger.info("Looking for the index on HF")
+        hf_hub_download(
             repo_id=HF_DATASET_ID,
             filename="cards_index.faiss",
             repo_type="dataset",
             local_dir=str(DATA_DIR),
         )
-        hf_hub_download(  # nosec B615
+        hf_hub_download(
             repo_id=HF_DATASET_ID,
             filename="cards_metadata.json",
             repo_type="dataset",
             local_dir=str(DATA_DIR),
         )
-        print("Index loaded from HF")
+    except Exception:
+        logger.warning("No index on HF, building a local one", exc_info=True)
+    else:
+        logger.info("Index loaded from HF")
         return
-    except Exception as e:
-        print(f"No index found online ({e}). Building local index")
 
     # Fallback if construction not found
-    ds = load_dataset(  # nosec B615
-        HF_DATASET_ID, split="train", streaming=True
-    )
+    ds = load_dataset(HF_DATASET_ID, split="train", streaming=True)
 
     # Fetch dimension dynamicly
     index = faiss.IndexFlatIP(model.config.hidden_size)
-    metadata = []
+    metadata: list[CardEntry] = []
     processed_count = 0
 
-    print("Indexing cards")
+    logger.info("Indexing cards")
     for batch in ds.iter(batch_size=BATCH_SIZE):
         try:
             images = [img.convert("RGB") for img in batch["image"]]
@@ -79,46 +87,48 @@ def build_index():
             index.add(embeddings)
 
             # Store Name + ID
-            for name, id_card in zip(batch["name"], batch["id_card"]):
+            for name, id_card in zip(
+                batch["name"], batch["id_card"], strict=True
+            ):
                 metadata.append({"name": name, "id": id_card})
 
             processed_count += len(images)
-            print(f"Indexed cards : {processed_count}", end="\r")
+            logger.debug("Indexed cards: %d", processed_count)
 
-        except Exception as e:
-            print(f"\nBatch error : {e}")
+        except Exception:
+            logger.exception("Batch failed")
             continue
 
     if index.ntotal == 0 or len(metadata) == 0:
-        print("\nError : Empty index. Check HF dataset")
+        logger.error("Empty index, check the HF dataset")
         return
 
-    print(f"\nSaving index in : {DATA_DIR}")
-    os.makedirs(str(DATA_DIR), exist_ok=True)
+    logger.info("Saving %d cards in %s", index.ntotal, DATA_DIR)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
     faiss.write_index(index, str(INDEX_FILE))
-    with open(str(NAMES_FILE), "w", encoding="utf-8") as f:
+    with NAMES_FILE.open("w", encoding="utf-8") as f:
         json.dump(metadata, f)
 
 
-def _load_metadata() -> list:
-    with open(str(NAMES_FILE), encoding="utf-8") as f:
+def _load_metadata() -> list[CardEntry]:
+    with NAMES_FILE.open(encoding="utf-8") as f:
         data = json.load(f)
     if not isinstance(data, list):
-        raise ValueError("cards_metadata.json must contain a JSON array")
+        msg = "cards_metadata.json must contain a JSON array"
+        raise TypeError(msg)
     for entry in data:
-        if not isinstance(entry, dict) or not isinstance(
-            entry.get("id"), str
-        ):
-            raise ValueError("cards_metadata.json entry missing string id")
+        if not isinstance(entry, dict) or not isinstance(entry.get("id"), str):
+            msg = "cards_metadata.json entry missing string id"
+            raise TypeError(msg)
     return data
 
 
 _index: faiss.Index | None = None
-_metadata: list | None = None
+_metadata: list[CardEntry] | None = None
 _index_lock = threading.Lock()
 
 
-def _ensure_index() -> tuple[faiss.Index, list]:
+def _ensure_index() -> tuple[faiss.Index, list[CardEntry]]:
     global _index, _metadata
 
     if _index is not None and _metadata is not None:
@@ -135,7 +145,7 @@ def _ensure_index() -> tuple[faiss.Index, list]:
         metadata = _load_metadata()
 
         if index.ntotal == 0 or len(metadata) == 0:
-            print("Empty index detected locally. Rebuilding...")
+            logger.warning("Empty local index, rebuilding")
             build_index()
             index = faiss.read_index(str(INDEX_FILE))
             metadata = _load_metadata()
@@ -146,11 +156,13 @@ def _ensure_index() -> tuple[faiss.Index, list]:
 
 
 def warm_up() -> None:
+    """Load the index at startup when it is already on disk."""
     if INDEX_FILE.exists() and NAMES_FILE.exists():
         _ensure_index()
 
 
-def search_card(image_bytes: bytes) -> list:
+def search_card(image_bytes: bytes) -> list[CardMatch]:
+    """Return the three closest cards, with their data from the API."""
     index, metadata = _ensure_index()
 
     query_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -164,7 +176,7 @@ def search_card(image_bytes: bytes) -> list:
 
     # Get 3 best matches
     scores, indices = index.search(query_emb, 3)
-    results = []
+    results: list[CardMatch] = []
 
     for i in range(3):
         idx = indices[0][i]
@@ -182,7 +194,7 @@ def search_card(image_bytes: bytes) -> list:
                 {"score": round(float(score), 4), "data": response.json()}
             )
         except requests.exceptions.RequestException as e:
-            print(f"API error for ID {card_id}: {e}")
+            logger.warning("API error for card %s: %s", card_id, e)
             results.append(
                 {
                     "score": round(float(score), 4),

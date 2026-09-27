@@ -1,11 +1,21 @@
-import app.models.model as model
+from typing import TYPE_CHECKING
+
+import faiss
+import pytest
+
+from app.models import model
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class _FakeIndex:
     ntotal = 1
 
 
-def _pretend_index_sits_on_disk(monkeypatch, tmp_path):
+def _pretend_index_sits_on_disk(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     # Fake a prebuilt index on disk and drop any cached one
     index_file = tmp_path / "cards_index.faiss"
     names_file = tmp_path / "cards_metadata.json"
@@ -19,15 +29,17 @@ def _pretend_index_sits_on_disk(monkeypatch, tmp_path):
     monkeypatch.setattr(model, "_metadata", None)
 
 
-def test_the_index_is_read_once_and_then_reused(monkeypatch, tmp_path):
+def test_the_index_is_read_once_and_then_reused(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     _pretend_index_sits_on_disk(monkeypatch, tmp_path)
-    reads = []
+    reads: list[str] = []
 
-    def fake_read_index(path):
+    def fake_read_index(path: str) -> _FakeIndex:
         reads.append(path)
         return _FakeIndex()
 
-    monkeypatch.setattr(model.faiss, "read_index", fake_read_index)
+    monkeypatch.setattr(faiss, "read_index", fake_read_index)
 
     model._ensure_index()
     model._ensure_index()
@@ -35,9 +47,11 @@ def test_the_index_is_read_once_and_then_reused(monkeypatch, tmp_path):
     assert len(reads) == 1, "the index must not be reloaded per request"
 
 
-def test_warm_up_leaves_a_missing_index_lazy(monkeypatch, tmp_path):
-    def must_not_run():
-        raise AssertionError("warm_up must not build the index")
+def test_warm_up_leaves_a_missing_index_lazy(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    def must_not_run() -> None:
+        pytest.fail("warm_up must not build the index")
 
     monkeypatch.setattr(model, "INDEX_FILE", tmp_path / "absent.faiss")
     monkeypatch.setattr(model, "NAMES_FILE", tmp_path / "absent.json")

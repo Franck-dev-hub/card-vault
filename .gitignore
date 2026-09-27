@@ -21,6 +21,7 @@ node_modules/
 __pycache__/
 *.pyc
 .venv/
+.coverage
 apps/ml/app/models/data_cache/
 
 # PHP / Symfony

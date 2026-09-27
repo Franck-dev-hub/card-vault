@@ -65,7 +65,7 @@ function frontend(): void
 function pytest(): void
 {
     io()->section('pytest');
-    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pytest', 'pytest']);
+    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pytest', '--with', 'httpx2', 'pytest']);
 }
 
 #[AsTask(name: 'ml', description: 'Run the ML tests (pytest)')]

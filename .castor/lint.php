@@ -104,6 +104,11 @@ function python_version(): void
         'apps/ml/pyproject.toml' => read_version($root . '/apps/ml/pyproject.toml', '/^requires-python = "==(\d+\.\d+)\.\*"$/m'),
         'docker/ml/Dockerfile' => read_version($root . '/docker/ml/Dockerfile', '/^ARG PYTHON_VERSION=(\S+)$/m'),
     ];
+    // Compose loads .env.local over .env: a stale copy would pin the old version.
+    $local = $root . '/.env.local';
+    if (is_file($local) && null !== $version = read_version($local, '/^PYTHON_VERSION=(\S+)$/m')) {
+        $versions['.env.local'] = $version;
+    }
 
     assert_same_version($versions);
     io()->success(\sprintf('Python %s everywhere.', $versions['.env']));

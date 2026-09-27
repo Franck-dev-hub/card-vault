@@ -1,4 +1,7 @@
 ARG PYTHON_VERSION=3.12
+ARG USER=cardvault
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 # ---------------------------------------------------------------------------
 # ML service: FastAPI + PyTorch + FAISS + Hugging Face

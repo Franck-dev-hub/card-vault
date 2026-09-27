@@ -127,6 +127,11 @@ jobs:
           - name: frontend
             file: docker/frontend/Dockerfile
             target: ""
+          - name: ml
+            file: docker/ml/Dockerfile
+            target: ""
+            # Its 10.7 GB layer would evict the other caches (10 GB per repo), see #149.
+            uncached: true
     steps:
       - uses: actions/checkout@v4
 
@@ -141,8 +146,8 @@ jobs:
           target: ${{ matrix.target }}
           push: false
           # Scoped per image, or both entries overwrite the same cache.
-          cache-from: type=gha,scope=${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          cache-from: ${{ !matrix.uncached && format('type=gha,scope={0}', matrix.name) || '' }}
+          cache-to: ${{ !matrix.uncached && format('type=gha,mode=max,scope={0}', matrix.name) || '' }}
 
   e2e:
     name: E2E (Playwright)

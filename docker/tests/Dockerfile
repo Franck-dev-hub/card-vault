@@ -1,5 +1,5 @@
-ARG NODEJS_VERSION=22
-ARG PLAYWRIGHT_VERSION=1.49.0
+ARG NODEJS_VERSION=26
+ARG PLAYWRIGHT_VERSION=1.63.0
 
 # ---------------------------------------------------------------------------
 # Playwright E2E runner (CI): Angular app tests
@@ -26,7 +26,7 @@ RUN <<-EOF
     usermod -g "${USER}" "${USER}"
 EOF
 
-RUN npm install -g corepack@latest
+RUN npm install -g pnpm@12
 
 USER ${USER}
 

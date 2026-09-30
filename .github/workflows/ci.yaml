@@ -22,7 +22,7 @@ jobs:
       options: --user root
     services:
       database:
-        image: postgres:16-alpine
+        image: postgres:18-alpine
         env:
           POSTGRES_DB: app
           POSTGRES_USER: app
@@ -36,10 +36,10 @@ jobs:
       APP_ENV: test
       APP_DEBUG: 1
       DEFAULT_URI: http://localhost
-      DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=16&charset=utf8
+      DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=18&charset=utf8
       COMPOSER_ALLOW_SUPERUSER: 1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # Infection diffs against the base branch.
           fetch-depth: 0
@@ -68,13 +68,16 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     container:
-      image: node:22-slim
+      image: node:26-slim
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: castor-php/setup-castor@v1.1.0
+      - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.7.0
+          version: v1.8.1
+
+      - name: Install pnpm
+        run: npm install -g pnpm@12
 
       - name: Install
         run: castor setup:frontend
@@ -93,20 +96,20 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read the Python version
         run: grep '^PYTHON_VERSION=' .env >> "$GITHUB_ENV"
 
-      - uses: astral-sh/setup-uv@v10.2.0
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           # Multi-GB torch wheels would evict the other jobs' caches.
           enable-cache: false
 
-      - uses: castor-php/setup-castor@v1.1.0
+      - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.7.0
+          version: v1.8.1
 
       - name: Install
         run: castor setup:ml
@@ -140,13 +143,11 @@ jobs:
             # Its 10.7 GB layer would evict the other caches (10 GB per repo), see #149.
             uncached: true
     steps:
-      - uses: actions/checkout@v4
-
-      # The default docker driver cannot export the gha cache.
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           file: ${{ matrix.file }}
@@ -164,11 +165,11 @@ jobs:
       # E2E needs the whole Docker stack.
       CASTOR_RUNTIME: host
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: castor-php/setup-castor@v1.1.0
+      - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.7.0
+          version: v1.8.1
 
       - name: Prepare environment
         run: castor setup:env

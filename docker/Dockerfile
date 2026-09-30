@@ -1,9 +1,9 @@
-ARG PHP_VERSION=8.4
-ARG FRANKENPHP_VERSION=1.12.6
-ARG COMPOSER_VERSION=2.9
-ARG NODEJS_VERSION=22
+ARG PHP_VERSION=8.5
+ARG FRANKENPHP_VERSION=1.12.7
+ARG COMPOSER_VERSION=2.10
+ARG NODEJS_VERSION=26
 ARG PHP_EXTENSION_INSTALLER_VERSION=2
-ARG CASTOR_VERSION=1.7.0
+ARG CASTOR_VERSION=1.8.1
 ARG PHP_EXTENSIONS="intl opcache apcu pdo_pgsql redis sodium"
 ARG USER=cardvault
 ARG USER_ID=1000
@@ -97,8 +97,8 @@ EOF
 
 COPY --link docker/php/pcov.ini $PHP_INI_DIR/conf.d/pcov.ini
 
-# Enable corepack (pnpm auto-provisioned via packageManager field in package.json)
-RUN rm -rf /usr/local/bin/yarn /usr/local/bin/yarnpkg && corepack enable
+# Node 25+ ships no corepack; pnpm switches itself to the packageManager version.
+RUN rm -rf /usr/local/bin/yarn /usr/local/bin/yarnpkg && npm install -g pnpm@12
 
 RUN mkdir -p /home/${USER}/.composer && chown ${USER_ID}:${GROUP_ID} /home/${USER}/.composer
 

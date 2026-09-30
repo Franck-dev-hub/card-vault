@@ -66,14 +66,14 @@ function eslint(
     bool $fix = false,
 ): void {
     io()->section('ESLint');
-    \exec_in(\App::Frontend, ['corepack', 'pnpm', 'run', 'lint', ...($fix ? ['--fix'] : [])]);
+    \exec_in(\App::Frontend, ['pnpm', 'run', 'lint', ...($fix ? ['--fix'] : [])]);
 }
 
 #[AsTask(name: 'tsc', namespace: 'lint:frontend', description: 'Type-check TypeScript')]
 function tsc(): void
 {
     io()->section('tsc');
-    \exec_in(\App::Frontend, ['corepack', 'pnpm', 'exec', 'tsc', '--noEmit']);
+    \exec_in(\App::Frontend, ['pnpm', 'exec', 'tsc', '--noEmit']);
 }
 
 #[AsTask(name: 'ruff', namespace: 'lint:ml', description: 'Lint Python with Ruff')]

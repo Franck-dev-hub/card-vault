@@ -31,10 +31,10 @@ jobs:
             file: docker/Dockerfile
             target: frankenphp_release
             args: |
-              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '22' }}
-              PHP_VERSION=${{ vars.PHP_VERSION || '8.4' }}
-              FRANKENPHP_VERSION=${{ vars.FRANKENPHP_VERSION || '1.12.6' }}
-              COMPOSER_VERSION=${{ vars.COMPOSER_VERSION || '2.9' }}
+              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '26' }}
+              PHP_VERSION=${{ vars.PHP_VERSION || '8.5' }}
+              FRANKENPHP_VERSION=${{ vars.FRANKENPHP_VERSION || '1.12.7' }}
+              COMPOSER_VERSION=${{ vars.COMPOSER_VERSION || '2.10' }}
               PHP_EXTENSIONS=${{ vars.PHP_EXTENSIONS || 'intl opcache apcu pdo_pgsql redis sodium' }}
               SESSION_LIFETIME=${{ vars.SESSION_LIFETIME || '604800' }}
               USER=${{ vars.PROJECT_NAME || 'cardvault' }}
@@ -46,7 +46,7 @@ jobs:
             file: docker/frontend/Dockerfile
             target: ""
             args: |
-              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '22' }}
+              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '26' }}
           - name: ml
             file: docker/ml/Dockerfile
             target: ""
@@ -56,11 +56,11 @@ jobs:
               GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -68,7 +68,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ env.REGISTRY }}/${{ matrix.name }}/${{ env.ENV }}
           tags: |
@@ -77,7 +77,7 @@ jobs:
             type=ref,event=tag
 
       - name: Build and push ${{ matrix.name }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           file: ${{ matrix.file }}

@@ -19,7 +19,7 @@ function backend(): void
 function frontend(): void
 {
     io()->section('pnpm audit');
-    \exec_in(\App::Frontend, ['corepack', 'pnpm', 'audit']);
+    \exec_in(\App::Frontend, ['pnpm', 'audit']);
 }
 
 #[AsTask(name: 'ml', description: 'Audit Python dependencies')]

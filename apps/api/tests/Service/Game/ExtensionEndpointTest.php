@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence;
+namespace App\Tests\Service\Game;
 
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\LicenceClientInterface;
-use App\Service\Licence\LicenceClientRegistry;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\GameClientInterface;
+use App\Service\Game\GameClientRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -24,14 +24,14 @@ final class ExtensionEndpointTest extends WebTestCase
             $cache->clear();
         }
 
-        $licence = $this->createStub(LicenceClientInterface::class);
-        $licence->method('listExtensions')->willReturn([new Extension(id: 'base1', name: 'Base Set', totalCards: 102)]);
+        $game = $this->createStub(GameClientInterface::class);
+        $game->method('listExtensions')->willReturn([new Extension(id: 'base1', name: 'Base Set', totalCards: 102)]);
 
-        self::getContainer()->set(LicenceClientRegistry::class, new LicenceClientRegistry(new ServiceLocator([
-            'pokemon' => static fn (): LicenceClientInterface => $licence,
+        self::getContainer()->set(GameClientRegistry::class, new GameClientRegistry(new ServiceLocator([
+            'pokemon' => static fn (): GameClientInterface => $game,
         ])));
 
-        $client->request('GET', '/api/licence/pokemon/extensions', server: ['HTTP_ACCEPT' => 'application/json']);
+        $client->request('GET', '/api/games/pokemon/extensions', server: ['HTTP_ACCEPT' => 'application/json']);
 
         self::assertResponseIsSuccessful();
         self::assertJsonStringEqualsJsonString(

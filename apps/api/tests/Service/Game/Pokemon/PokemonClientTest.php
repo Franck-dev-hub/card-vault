@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence\Pokemon;
+namespace App\Tests\Service\Game\Pokemon;
 
-use App\Service\Licence\LicenceNotFoundException;
-use App\Service\Licence\Pokemon\PokemonClient;
-use App\Service\Licence\Pokemon\PokemonNormaliser;
-use App\Service\Licence\UpstreamAwareHttpClient;
-use App\Service\Licence\UpstreamNotAvailableException;
+use App\Service\Game\GameNotFoundException;
+use App\Service\Game\Pokemon\PokemonClient;
+use App\Service\Game\Pokemon\PokemonNormaliser;
+use App\Service\Game\UpstreamAwareHttpClient;
+use App\Service\Game\UpstreamNotAvailableException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -101,7 +101,7 @@ final class PokemonClientTest extends TestCase
             new MockResponse('', ['http_code' => 404]),
         ]);
 
-        $this->expectException(LicenceNotFoundException::class);
+        $this->expectException(GameNotFoundException::class);
 
         $this->buildClient($httpClient)->listCards('does-not-exist');
     }
@@ -141,7 +141,7 @@ final class PokemonClientTest extends TestCase
             new MockResponse('', ['http_code' => 404]),
         ]);
 
-        $this->expectException(LicenceNotFoundException::class);
+        $this->expectException(GameNotFoundException::class);
 
         $this->buildClient($httpClient)->getCard('does-not-exist');
     }

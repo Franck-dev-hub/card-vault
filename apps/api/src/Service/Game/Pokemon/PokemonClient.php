@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Pokemon;
+namespace App\Service\Game\Pokemon;
 
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\LicenceClientInterface;
-use App\Service\Licence\LicenceNotFoundException;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\GameClientInterface;
+use App\Service\Game\GameNotFoundException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use TCGdex\Model\SetResume;
 use TCGdex\TCGdex;
 
-#[AutoconfigureTag('app.licence_client', ['slug' => 'pokemon'])]
-final readonly class PokemonClient implements LicenceClientInterface
+#[AutoconfigureTag('app.game_client', ['slug' => 'pokemon'])]
+final readonly class PokemonClient implements GameClientInterface
 {
     public function __construct(
         private TCGdex $tcgdex,
@@ -39,7 +39,7 @@ final readonly class PokemonClient implements LicenceClientInterface
         $set = $this->tcgdex->set->get($extensionId);
 
         if (null === $set) {
-            throw new LicenceNotFoundException("Unknown extension: {$extensionId}");
+            throw new GameNotFoundException("Unknown extension: {$extensionId}");
         }
 
         return array_map(
@@ -53,7 +53,7 @@ final readonly class PokemonClient implements LicenceClientInterface
         $card = $this->tcgdex->card->get($cardId);
 
         if (null === $card) {
-            throw new LicenceNotFoundException("Unknown card: {$cardId}");
+            throw new GameNotFoundException("Unknown card: {$cardId}");
         }
 
         return $this->normaliser->normaliseCard($card);

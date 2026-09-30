@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Pokemon;
+namespace App\Service\Game\Pokemon;
 
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\Dto\PriceSet;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\Dto\PriceSet;
 use TCGdex\Model\Card as SdkCard;
 use TCGdex\Model\SetResume;
 
@@ -24,7 +24,7 @@ final class PokemonNormaliser
     public function normaliseCard(SdkCard $sdkCard): Card
     {
         return new Card(
-            licence: 'pokemon',
+            game: 'pokemon',
             cardId: "pokemon-{$sdkCard->id}",
             cardNumber: $sdkCard->localId,
             cardName: $sdkCard->name,

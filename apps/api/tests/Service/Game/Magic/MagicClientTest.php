@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence\Magic;
+namespace App\Tests\Service\Game\Magic;
 
-use App\Service\Licence\LicenceNotFoundException;
-use App\Service\Licence\Magic\MagicClient;
-use App\Service\Licence\Magic\MagicNormaliser;
-use App\Service\Licence\UpstreamNotAvailableException;
+use App\Service\Game\GameNotFoundException;
+use App\Service\Game\Magic\MagicClient;
+use App\Service\Game\Magic\MagicNormaliser;
+use App\Service\Game\UpstreamNotAvailableException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -84,7 +84,7 @@ final class MagicClientTest extends TestCase
     {
         $client = $this->buildClient([$this->json([], 404)]);
 
-        $this->expectException(LicenceNotFoundException::class);
+        $this->expectException(GameNotFoundException::class);
         $this->expectExceptionCode(0);
 
         $client->listCards('does-not-exist');

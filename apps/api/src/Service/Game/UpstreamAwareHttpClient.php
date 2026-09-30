@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence;
+namespace App\Service\Game;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -13,7 +13,7 @@ final readonly class UpstreamAwareHttpClient implements ClientInterface
 {
     public function __construct(
         private ClientInterface $decorated,
-        private string $licenceSlug,
+        private string $gameSlug,
     ) {
     }
 
@@ -22,11 +22,11 @@ final readonly class UpstreamAwareHttpClient implements ClientInterface
         try {
             $response = $this->decorated->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
-            throw new UpstreamNotAvailableException($this->licenceSlug, "Upstream for licence \"{$this->licenceSlug}\" is unreachable", $e);
+            throw new UpstreamNotAvailableException($this->gameSlug, "Upstream for game \"{$this->gameSlug}\" is unreachable", $e);
         }
 
         if ($response->getStatusCode() >= 500) {
-            throw new UpstreamNotAvailableException($this->licenceSlug, "Upstream for licence \"{$this->licenceSlug}\" returned {$response->getStatusCode()}");
+            throw new UpstreamNotAvailableException($this->gameSlug, "Upstream for game \"{$this->gameSlug}\" returned {$response->getStatusCode()}");
         }
 
         return $response;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence;
+namespace App\Tests\Service\Game;
 
-use App\Service\Licence\UpstreamAwareHttpClient;
-use App\Service\Licence\UpstreamNotAvailableException;
+use App\Service\Game\UpstreamAwareHttpClient;
+use App\Service\Game\UpstreamNotAvailableException;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -54,8 +54,8 @@ final class UpstreamAwareHttpClientTest extends TestCase
     }
 
     /**
-     * A missing card must stay a 404 so the SDK turns it into null, which the licence
-     * client reports as LicenceNotFoundException rather than an outage.
+     * A missing card must stay a 404 so the SDK turns it into null, which the game
+     * client reports as GameNotFoundException rather than an outage.
      */
     public function testClientErrorPassesThroughUntouched(): void
     {
@@ -74,7 +74,7 @@ final class UpstreamAwareHttpClientTest extends TestCase
             $client->sendRequest(new Request('GET', '/sets'));
             self::fail('Expected an UpstreamNotAvailableException.');
         } catch (UpstreamNotAvailableException $e) {
-            self::assertSame('pokemon', $e->licenceSlug);
+            self::assertSame('pokemon', $e->gameSlug);
             self::assertStringContainsString('503', $e->getMessage());
         }
     }
@@ -98,7 +98,7 @@ final class UpstreamAwareHttpClientTest extends TestCase
             $client->sendRequest(new Request('GET', '/sets'));
             self::fail('Expected an UpstreamNotAvailableException.');
         } catch (UpstreamNotAvailableException $e) {
-            self::assertSame('pokemon', $e->licenceSlug);
+            self::assertSame('pokemon', $e->gameSlug);
             self::assertSame($cause, $e->getPrevious());
         }
     }

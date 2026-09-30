@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Magic;
+namespace App\Service\Game\Magic;
 
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\LicenceClientInterface;
-use App\Service\Licence\LicenceNotFoundException;
-use App\Service\Licence\UpstreamNotAvailableException;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\GameClientInterface;
+use App\Service\Game\GameNotFoundException;
+use App\Service\Game\UpstreamNotAvailableException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -18,8 +18,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * @phpstan-import-type ScryfallSet from MagicNormaliser
  * @phpstan-import-type ScryfallCard from MagicNormaliser
  */
-#[AutoconfigureTag('app.licence_client', ['slug' => 'magic'])]
-final readonly class MagicClient implements LicenceClientInterface
+#[AutoconfigureTag('app.game_client', ['slug' => 'magic'])]
+final readonly class MagicClient implements GameClientInterface
 {
     private const SLUG = 'magic';
 
@@ -87,7 +87,7 @@ final readonly class MagicClient implements LicenceClientInterface
         try {
             return $this->scryfallClient->request('GET', $path)->toArray();
         } catch (ClientExceptionInterface $e) {
-            throw new LicenceNotFoundException("Not found upstream: {$path}", 0, $e);
+            throw new GameNotFoundException("Not found upstream: {$path}", 0, $e);
         } catch (ExceptionInterface $e) {
             throw new UpstreamNotAvailableException(self::SLUG, 'Upstream Scryfall is unavailable', $e);
         }

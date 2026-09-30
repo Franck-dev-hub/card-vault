@@ -6,39 +6,39 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Service\Licence\Dto\Licence;
+use App\Service\Game\Dto\Game;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ProviderInterface<Licence>
+ * @implements ProviderInterface<Game>
  */
-final readonly class LicenceProvider implements ProviderInterface
+final readonly class GameProvider implements ProviderInterface
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%/resources/licences.json')]
-        private string $licencesFile,
+        #[Autowire('%kernel.project_dir%/resources/games.json')]
+        private string $gamesFile,
     ) {
     }
 
     /**
-     * @return Licence[]
+     * @return Game[]
      */
     public function provide(
         Operation $operation,
         array $uriVariables = [],
         array $context = [],
     ): array {
-        $json = file_get_contents($this->licencesFile);
+        $json = file_get_contents($this->gamesFile);
 
         if (false === $json) {
-            throw new \RuntimeException("Unable to read licences file: {$this->licencesFile}");
+            throw new \RuntimeException("Unable to read games file: {$this->gamesFile}");
         }
 
         /** @var list<array{slug: string, name: string}> $rows */
         $rows = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
 
         return array_map(
-            static fn (array $row) => new Licence(
+            static fn (array $row) => new Game(
                 slug: $row['slug'],
                 name: $row['name'],
             ),

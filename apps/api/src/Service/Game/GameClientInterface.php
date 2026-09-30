@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence;
+namespace App\Service\Game;
 
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\Dto\Extension;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\Dto\Extension;
 
-interface LicenceClientInterface
+interface GameClientInterface
 {
     /** @return Extension[] */
     public function listExtensions(): array;

@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence;
+namespace App\Service\Game;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-final readonly class LicenceClientRegistry
+final readonly class GameClientRegistry
 {
     /**
-     * @param ServiceLocator<LicenceClientInterface> $locator
+     * @param ServiceLocator<GameClientInterface> $locator
      */
     public function __construct(
-        #[AutowireLocator('app.licence_client', indexAttribute: 'slug')]
+        #[AutowireLocator('app.game_client', indexAttribute: 'slug')]
         private ServiceLocator $locator,
     ) {
     }
 
-    public function get(string $slug): LicenceClientInterface
+    public function get(string $slug): GameClientInterface
     {
         if ($this->locator->has($slug)) {
             return $this->locator->get($slug);
         }
-        throw new LicenceNotFoundException('Licence not found: '.$slug);
+        throw new GameNotFoundException('Game not found: '.$slug);
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence\Pokemon;
+namespace App\Tests\Service\Game\Pokemon;
 
-use App\Service\Licence\Pokemon\PokemonNormaliser;
+use App\Service\Game\Pokemon\PokemonNormaliser;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +93,7 @@ final class PokemonNormaliserTest extends TestCase
 
         $card = $this->normaliser->normaliseCard($sdkCard);
 
-        self::assertSame('pokemon', $card->licence);
+        self::assertSame('pokemon', $card->game);
         self::assertSame('pokemon-swsh3-136', $card->cardId);
         self::assertSame('136', $card->cardNumber);
         self::assertSame('Furret', $card->cardName);

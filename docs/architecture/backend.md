@@ -9,25 +9,25 @@ The interactive OpenAPI documentation is the canonical reference:
 `Live` means the route answers today.\
 Any endpoint added or implemented must flip its row here in the same PR.
 
-| Method | Path                                         | Auth | Status  | Purpose                          |
-|--------|----------------------------------------------|------|---------|----------------------------------|
-| GET    | /health                                      | No   | Live    | Liveness check                   |
-| GET    | /api/licence                                 | No   | Live    | List games                       |
-| GET    | /api/licence/{slug}/extensions               | No   | Live    | List a game's extensions         |
-| GET    | /api/licence/{slug}/extensions/{setId}/cards | No   | Live    | List an extension's cards        |
-| GET    | /api/licence/{slug}/cards/{cardId}           | No   | Live    | Get a single card                |
-| POST   | /api/register                                | No   | Planned | Create an account                |
-| POST   | /api/login                                   | No   | Planned | Start a session                  |
-| POST   | /api/logout                                  | Yes  | Planned | Destroy the session              |
-| GET    | /api/me                                      | Yes  | Planned | Get the connected user           |
-| GET    | /api/vault                                   | Yes  | Planned | List the vault's copies          |
-| POST   | /api/vault                                   | Yes  | Planned | Add a copy                       |
-| PATCH  | /api/vault/{id}                              | Yes  | Planned | Update a copy                    |
-| DELETE | /api/vault/{id}                              | Yes  | Planned | Remove a copy                    |
-| GET    | /api/vault/stats                             | Yes  | Planned | Vault statistics                 |
-| GET    | /api/vault/recent                            | Yes  | Planned | Recently added copies            |
-| GET    | /api/dashboard                               | Yes  | Planned | Dashboard data                   |
-| POST   | /api/scan                                    | Yes  | Planned | Proxy an image to the ML service |
+| Method | Path                                             | Auth | Status  | Purpose                          |
+|--------|--------------------------------------------------|------|---------|----------------------------------|
+| GET    | /health                                          | No   | Live    | Liveness check                   |
+| GET    | /api/games                                       | No   | Live    | List games                       |
+| GET    | /api/games/{slug}/extensions                     | No   | Live    | List a game's extensions         |
+| GET    | /api/games/{slug}/extensions/{extensionId}/cards | No   | Live    | List an extension's cards        |
+| GET    | /api/games/{slug}/cards/{cardId}                 | No   | Live    | Get a single card                |
+| POST   | /api/register                                    | No   | Planned | Create an account                |
+| POST   | /api/login                                       | No   | Planned | Start a session                  |
+| POST   | /api/logout                                      | Yes  | Planned | Destroy the session              |
+| GET    | /api/me                                          | Yes  | Planned | Get the connected user           |
+| GET    | /api/vault                                       | Yes  | Planned | List the vault's copies          |
+| POST   | /api/vault                                       | Yes  | Planned | Add a copy                       |
+| PATCH  | /api/vault/{id}                                  | Yes  | Planned | Update a copy                    |
+| DELETE | /api/vault/{id}                                  | Yes  | Planned | Remove a copy                    |
+| GET    | /api/vault/stats                                 | Yes  | Planned | Vault statistics                 |
+| GET    | /api/vault/recent                                | Yes  | Planned | Recently added copies            |
+| GET    | /api/dashboard                                   | Yes  | Planned | Dashboard data                   |
+| POST   | /api/scan                                        | Yes  | Planned | Proxy an image to the ML service |
 
 ## Structure and organisation
 
@@ -38,7 +38,7 @@ Layout under `apps/api/src/`:
 - `Repository/`: Doctrine repositories.
 - `State/`: API Platform state providers, one per operation family.
 - `Service/`: business logic and external integrations, one folder per domain
-  (`Service/Licence/`), DTOs in its `Dto/` subfolder.
+  (`Service/Game/`), DTOs in its `Dto/` subfolder.
 - `ApiResource/`: reserved for API Platform resources that are not DTOs, empty
   today.
 

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence;
+namespace App\Service\Game;
 
-final class UpstreamNotAvailableException extends LicenceClientException
+final class UpstreamNotAvailableException extends GameClientException
 {
     public function __construct(
-        public readonly string $licenceSlug,
+        public readonly string $gameSlug,
         string $message,
         ?\Throwable $previous = null,
     ) {

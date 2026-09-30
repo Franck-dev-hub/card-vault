@@ -6,8 +6,8 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\LicenceClientRegistry;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\GameClientRegistry;
 
 /**
  * @implements ProviderInterface<Extension>
@@ -15,7 +15,7 @@ use App\Service\Licence\LicenceClientRegistry;
 final readonly class ExtensionProvider implements ProviderInterface
 {
     public function __construct(
-        private LicenceClientRegistry $registry,
+        private GameClientRegistry $registry,
     ) {
     }
 

@@ -9,4 +9,4 @@ services:
         resource: '../src/'
 
     TCGdex\TCGdex:
-        factory: ['App\Service\Licence\Pokemon\TcgdexFactory', 'create']
+        factory: ['App\Service\Game\Pokemon\TcgdexFactory', 'create']

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Dto;
+namespace App\Service\Game\Dto;
 
 final readonly class PriceSet
 {

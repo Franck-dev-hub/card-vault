@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Pokemon;
+namespace App\Service\Game\Pokemon;
 
-use App\Service\Licence\UpstreamAwareHttpClient;
+use App\Service\Game\UpstreamAwareHttpClient;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Symfony\Component\HttpClient\Psr18Client;
 use TCGdex\TCGdex;

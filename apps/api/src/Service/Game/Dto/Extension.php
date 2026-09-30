@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Dto;
+namespace App\Service\Game\Dto;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -12,7 +12,7 @@ use App\State\ExtensionProvider;
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/licence/{slug}/extensions',
+            uriTemplate: '/games/{slug}/extensions',
             provider: ExtensionProvider::class
         ),
     ],

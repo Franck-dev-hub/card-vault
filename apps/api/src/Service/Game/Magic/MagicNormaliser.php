@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Magic;
+namespace App\Service\Game\Magic;
 
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\Dto\Extension;
-use App\Service\Licence\Dto\PriceSet;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\Dto\Extension;
+use App\Service\Game\Dto\PriceSet;
 
 /**
  * @phpstan-type ScryfallSet array{code: string, name: string, card_count: int}
@@ -41,7 +41,7 @@ final class MagicNormaliser
     public function normaliseCard(array $card): Card
     {
         return new Card(
-            licence: 'magic',
+            game: 'magic',
             cardId: "magic-{$card['id']}",
             cardNumber: $card['collector_number'],
             cardName: $card['name'],

@@ -11,5 +11,5 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
     exception_to_status:
-        App\Service\Licence\LicenceNotFoundException: 404
-        App\Service\Licence\UpstreamNotAvailableException: 502
+        App\Service\Game\GameNotFoundException: 404
+        App\Service\Game\UpstreamNotAvailableException: 502

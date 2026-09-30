@@ -6,8 +6,8 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Service\Licence\Dto\Card;
-use App\Service\Licence\LicenceClientRegistry;
+use App\Service\Game\Dto\Card;
+use App\Service\Game\GameClientRegistry;
 
 /**
  * @implements ProviderInterface<Card>
@@ -15,7 +15,7 @@ use App\Service\Licence\LicenceClientRegistry;
 final readonly class CardItemProvider implements ProviderInterface
 {
     public function __construct(
-        private LicenceClientRegistry $registry,
+        private GameClientRegistry $registry,
     ) {
     }
 

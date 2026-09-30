@@ -1,15 +1,13 @@
 # Add a game
 
 Card data comes from the sources and is cached, never stored: see
-[ADR 0004](../adr/0004-live-card-data.md).\
-The code still calls a game a licence (`Licence`, `/api/licence`); #7 renames
-it.
+[ADR 0004](../adr/0004-live-card-data.md).
 
 ```
 request → API Platform operation (#[ApiResource] on the DTO)
         → state provider (src/State/)
-        → LicenceClientRegistry::get($slug)
-        → {Licence}Client → upstream → {Licence}Normaliser → DTO
+        → GameClientRegistry::get($slug)
+        → {Game}Client → upstream → {Game}Normaliser → DTO
 ```
 
 Clients declare themselves through a tag, so adding a game touches no provider,
@@ -22,7 +20,7 @@ JSON-LD by default, plain JSON through content negotiation.
 
 ## DTOs
 
-Plain readonly classes in `apps/api/src/Service/Licence/Dto/`, no Doctrine
+Plain readonly classes in `apps/api/src/Service/Game/Dto/`, no Doctrine
 mapping, identical across games so the frontend never branches on the game.\
 Their fields are in the OpenAPI documentation.
 
@@ -42,7 +40,7 @@ set.\
 
 | Situation                       | Exception                       | HTTP |
 |---------------------------------|---------------------------------|------|
-| Unknown slug, extension or card | `LicenceNotFoundException`      | 404  |
+| Unknown slug, extension or card | `GameNotFoundException`         | 404  |
 | Upstream 5xx or network failure | `UpstreamNotAvailableException` | 502  |
 
 Mapped in `config/packages/api_platform.yaml` under `exception_to_status`.\
@@ -58,7 +56,7 @@ one means any client failure.
 
 ## Adding a game
 
-Implement `LicenceClientInterface`:
+Implement `GameClientInterface`:
 
 ```php
 public function listExtensions(): array;               // Extension[]
@@ -66,14 +64,14 @@ public function listCards(string $extensionId): array; // Card[]
 public function getCard(string $cardId): Card;         // upstream ids are self-sufficient
 ```
 
-1. Create `src/Service/Licence/{Licence}/` with a client and a normaliser.
+1. Create `src/Service/Game/{Game}/` with a client and a normaliser.
 2. Tag the client with
-   `#[AutoconfigureTag('app.licence_client', ['slug' => '{slug}'])]`.
+   `#[AutoconfigureTag('app.game_client', ['slug' => '{slug}'])]`.
 3. Surface outages as `UpstreamNotAvailableException`, see above.\
    Declare a scoped client under `framework.http_client.scoped_clients` for a
    plain HTTP source (`scryfall.client`, injected as `$scryfallClient`), or a
    factory for an SDK (`TcgdexFactory`).
-4. Add the game to `apps/api/resources/licences.json`.
+4. Add the game to `apps/api/resources/games.json`.
 5. Update the games table in the [README](../../README.md#features).
 
 Routes, serialisation and OpenAPI documentation come from the shared providers.

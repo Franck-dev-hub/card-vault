@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Licence\Magic;
+namespace App\Tests\Service\Game\Magic;
 
-use App\Service\Licence\Magic\MagicNormaliser;
+use App\Service\Game\Magic\MagicNormaliser;
 use PHPUnit\Framework\TestCase;
 
 final class MagicNormaliserTest extends TestCase
@@ -46,7 +46,7 @@ final class MagicNormaliserTest extends TestCase
             'prices' => ['eur' => '1.63', 'eur_foil' => '2.07'],
         ]);
 
-        self::assertSame('magic', $card->licence);
+        self::assertSame('magic', $card->game);
         self::assertSame('magic-d6c48f07-63b7-4a60-8da6-ce77405abf1e', $card->cardId);
         self::assertSame('199', $card->cardNumber);
         self::assertSame('woe', $card->extensionId);

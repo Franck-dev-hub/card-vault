@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Licence\Dto;
+namespace App\Service\Game\Dto;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\State\LicenceProvider;
+use App\State\GameProvider;
 
 #[ApiResource(
     operations: [
         new GetCollection(
-            uriTemplate: '/licence',
-            provider: LicenceProvider::class
+            uriTemplate: '/games',
+            provider: GameProvider::class
         ),
     ],
 )]
-final readonly class Licence
+final readonly class Game
 {
     public function __construct(
         #[ApiProperty(identifier: true)]

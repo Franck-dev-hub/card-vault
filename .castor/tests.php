@@ -52,7 +52,7 @@ function backend(): void
 function vitest(): void
 {
     io()->section('Vitest');
-    \exec_in(\App::Frontend, ['corepack', 'pnpm', 'test']);
+    \exec_in(\App::Frontend, ['pnpm', 'test']);
 }
 
 #[AsTask(name: 'frontend', description: 'Run the frontend tests (Vitest)')]
@@ -81,7 +81,7 @@ function e2e(): void
 {
     io()->section('Playwright');
     \docker_compose(['up', '-d']);
-    \run_in_playwright(['sh', '-c', 'corepack pnpm install && corepack pnpm run test:e2e']);
+    \run_in_playwright(['sh', '-c', 'pnpm install && pnpm run test:e2e']);
 }
 
 #[AsTask(name: 'all', description: 'Run every test suite, E2E and mutation testing included')]

@@ -52,10 +52,13 @@ services:
     build: !reset
     working_dir: /app
     user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
-    command: ["sh", "-c", "corepack pnpm install && corepack pnpm exec ng serve --host 0.0.0.0"]
+    command: ["sh", "-c", "npm install -g --prefix /tmp/pnpm pnpm@12 && pnpm install && pnpm exec ng serve --host 0.0.0.0"]
     environment:
+      # The container user cannot write /usr/local, so pnpm lives in /tmp.
+      PATH: /tmp/pnpm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       CHOKIDAR_USEPOLLING: "true"
       CI: "true"
+      pnpm_config_frozen_lockfile: "false"
     volumes:
       - ../apps/frontend:/app
     healthcheck:

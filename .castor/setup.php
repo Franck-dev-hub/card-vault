@@ -29,20 +29,25 @@ function env(): void
 
     // One password to remember in dev.
     $password = bin2hex(random_bytes(16));
-    $secrets = [
-        'APP_SECRET' => bin2hex(random_bytes(32)),
-        'POSTGRES_PASSWORD' => $password,
-        'PGADMIN_PASSWORD' => $password,
-    ];
+    $appSecret = bin2hex(random_bytes(32));
 
-    $content = (string) file_get_contents($root . '/.env');
-    foreach ($secrets as $name => $value) {
-        $content = (string) preg_replace('/^' . $name . '=.*$/m', $name . '=' . $value, $content);
-    }
+    // Secrets only: a full copy would pin every version bumped in .env later.
+    fs()->dumpFile($root . '/.env.local', <<<ENV
+        # API / Symfony
+        APP_SECRET={$appSecret}
 
-    fs()->dumpFile($root . '/.env.local', $content);
+        # Postgres
+        POSTGRES_PASSWORD={$password}
 
-    io()->success('.env.local ready (dev, full copy with generated secrets).');
+        # Postgres admin
+        PGADMIN_PASSWORD={$password}
+
+        # ML service
+        HF_TOKEN=change-me
+
+        ENV);
+
+    io()->success('.env.local ready (dev secrets). Set HF_TOKEN before the first ML start.');
 }
 
 #[AsTask(name: 'backend', description: 'Install PHP dependencies')]
@@ -54,7 +59,7 @@ function backend(): void
 #[AsTask(name: 'frontend', description: 'Install JS dependencies')]
 function frontend(): void
 {
-    \exec_in(\App::Frontend, ['corepack', 'pnpm', 'install']);
+    \exec_in(\App::Frontend, ['pnpm', 'install']);
 }
 
 #[AsTask(name: 'ml', description: 'Install Python dependencies')]

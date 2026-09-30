@@ -39,8 +39,6 @@ function docker_compose(array $arguments, ?Context $context = null, bool $ci = f
 function exec_in(App $app, array $command, array $environment = [], ?Context $context = null): Process
 {
     $context ??= context();
-    // corepack otherwise hangs on a download prompt.
-    $environment += ['COREPACK_ENABLE_DOWNLOAD_PROMPT' => '0'];
 
     if (Runtime::Ci === runtime()) {
         return run($command, context: $context
@@ -61,7 +59,6 @@ function run_in_playwright(array $command): Process
     return docker_compose([
         '--profile', 'e2e',
         'run', '--rm', '--no-deps', '-T',
-        '-e', 'COREPACK_ENABLE_DOWNLOAD_PROMPT=0',
         'playwright',
         ...$command,
     ], ci: true);

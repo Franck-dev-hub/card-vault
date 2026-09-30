@@ -89,7 +89,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:?error}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?error}
     volumes:
-      - database_data:/var/lib/postgresql/data
+      - database_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:?error} -d ${POSTGRES_DB:?error}"]
       start_period: 10s

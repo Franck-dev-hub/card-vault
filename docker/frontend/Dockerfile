@@ -1,11 +1,11 @@
-ARG NODEJS_VERSION=22
+ARG NODEJS_VERSION=26
 
 # ---------------------------------------------------------------------------
 # Build stage: compile the Angular app
 # ---------------------------------------------------------------------------
 FROM node:${NODEJS_VERSION}-alpine AS build
 
-RUN corepack enable
+RUN npm install -g pnpm@12
 
 WORKDIR /app
 

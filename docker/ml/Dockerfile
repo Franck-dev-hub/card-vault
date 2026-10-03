@@ -6,7 +6,7 @@ ARG GROUP_ID=1000
 # ---------------------------------------------------------------------------
 # ML service: FastAPI + PyTorch + FAISS + Hugging Face
 # ---------------------------------------------------------------------------
-FROM python:${PYTHON_VERSION}-slim AS ml_base
+FROM python:${PYTHON_VERSION}-slim@sha256:0741d101873c12ab927e6f8653feb8862b9bd58771177acb1b885b95141f91b4 AS ml_base
 
 ARG USER
 ARG USER_ID

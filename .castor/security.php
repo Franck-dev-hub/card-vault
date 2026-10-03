@@ -26,7 +26,7 @@ function frontend(): void
 function ml(): void
 {
     io()->section('pip-audit');
-    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pip-audit', 'pip-audit']);
+    \exec_in(\App::Ml, ['uv', 'run', 'pip-audit']);
 }
 
 #[AsTask(name: 'all', description: 'Audit every dependency set')]

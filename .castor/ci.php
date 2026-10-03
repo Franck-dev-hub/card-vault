@@ -44,7 +44,7 @@ function ml(): void
 const IMAGES = [
     'api' => ['docker/Dockerfile', 'frankenphp_release'],
     'frontend' => ['docker/frontend/Dockerfile', null],
-    'ml' => ['docker/ml/Dockerfile', null],
+    'ml' => ['docker/ml/Dockerfile', 'ml_release'],
 ];
 
 #[AsTask(name: 'docker', description: 'Build the release images from the git tree, as the CI does')]

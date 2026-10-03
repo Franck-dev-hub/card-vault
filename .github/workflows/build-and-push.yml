@@ -49,7 +49,7 @@ jobs:
               NODEJS_VERSION=${{ vars.NODEJS_VERSION || '26' }}
           - name: ml
             file: docker/ml/Dockerfile
-            target: ""
+            target: ml_release
             args: |
               USER=${{ vars.PROJECT_NAME || 'cardvault' }}
               USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}

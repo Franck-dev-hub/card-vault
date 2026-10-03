@@ -107,7 +107,7 @@ jobs:
         with:
           version: "0.12.21"
           python-version: ${{ env.PYTHON_VERSION }}
-          # Multi-GB torch wheels would evict the other jobs' caches.
+          # Leaves the 10 GB repo cache to the image builds.
           enable-cache: false
 
       - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
@@ -143,8 +143,6 @@ jobs:
           - name: ml
             file: docker/ml/Dockerfile
             target: ml_release
-            # Its 10.7 GB layer would evict the other caches (10 GB per repo), see #149.
-            uncached: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -157,8 +155,8 @@ jobs:
           target: ${{ matrix.target }}
           push: false
           # Scoped per image, or both entries overwrite the same cache.
-          cache-from: ${{ !matrix.uncached && format('type=gha,scope={0}', matrix.name) || '' }}
-          cache-to: ${{ !matrix.uncached && format('type=gha,mode=max,scope={0}', matrix.name) || '' }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
 
   e2e:
     name: E2E (Playwright)

@@ -4,7 +4,11 @@
 
 Python, FastAPI, PyTorch, Hugging Face Transformers (DINOv2), FAISS.\
 Dependencies are managed with uv (`pyproject.toml` + `uv.lock`) in the image
-build.
+build.\
+Dev tools (ruff, mypy, pytest, pip-audit) live in the `dev` dependency group.\
+The `ml_release` image has no dev tools, no uv binary and no extra apt
+packages.\
+The `ml_dev` image adds uv and the dev group; every build names its target.
 
 ## Role
 

@@ -65,8 +65,7 @@ function frontend(): void
 function pytest(): void
 {
     io()->section('pytest');
-    // Pinned: --with bypasses uv.lock, so an unpinned release would run unreviewed.
-    \exec_in(\App::Ml, ['uv', 'run', '--with', 'pytest==9.1.1', '--with', 'httpx2==2.13.1', 'pytest']);
+    \exec_in(\App::Ml, ['uv', 'run', 'pytest']);
 }
 
 #[AsTask(name: 'ml', description: 'Run the ML tests (pytest)')]

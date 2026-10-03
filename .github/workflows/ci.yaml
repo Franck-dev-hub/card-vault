@@ -139,7 +139,7 @@ jobs:
             target: ""
           - name: ml
             file: docker/ml/Dockerfile
-            target: ""
+            target: ml_release
             # Its 10.7 GB layer would evict the other caches (10 GB per repo), see #149.
             uncached: true
     steps:

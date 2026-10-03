@@ -185,7 +185,7 @@ def search_card(image_bytes: bytes) -> list[CardMatch]:
 
         score = scores[0][i]
         card_id = metadata[idx]["id"]
-        url = f"{BACKEND_URL}/api/licence/pokemon/cards/pokemon-{card_id}"
+        url = f"{BACKEND_URL}/api/games/pokemon/cards/pokemon-{card_id}"
 
         try:
             response = requests.get(url, timeout=2.0)

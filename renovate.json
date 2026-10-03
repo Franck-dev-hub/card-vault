@@ -1,5 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "osvVulnerabilityAlerts": true
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "The image and the CI must lock with the same uv.",
+      "matchPackageNames": ["ghcr.io/astral-sh/uv", "astral-sh/uv"],
+      "groupName": "uv"
+    }
+  ]
 }

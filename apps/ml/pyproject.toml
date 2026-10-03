@@ -13,11 +13,13 @@ dependencies = [
     "pillow>=12.3.0",
     "pydantic>=2.13.5",
     "requests>=2.34.2",
-    "torch>=2.14.1",
-    "torchvision>=0.24.1",
     "transformers>=4.57.6",
     "uvicorn>=0.40.0",
 ]
+
+[project.optional-dependencies]
+cpu = ["torch>=2.14.1", "torchvision>=0.24.1"]
+gpu = ["torch>=2.14.1", "torchvision>=0.24.1"]
 
 [dependency-groups]
 dev = [
@@ -28,6 +30,18 @@ dev = [
     "ruff==0.16.9",
     "types-requests>=2.33.0.20260712",
 ]
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "gpu" }]]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", extra = "cpu" }]
+torchvision = [{ index = "pytorch-cpu", extra = "cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 line-length = 79

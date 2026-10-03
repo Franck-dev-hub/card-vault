@@ -10,6 +10,30 @@ The `ml_release` image has no dev tools, no uv binary and no extra apt
 packages.\
 The `ml_dev` image adds uv and the dev group; every build names its target.
 
+## CPU and GPU
+
+Torch and torchvision are not base dependencies: they come with the `cpu` or
+`gpu` extra, which conflict.\
+`cpu` takes the PyTorch CPU index wheels, with no NVIDIA library.\
+`gpu` takes the PyPI wheels, built for CUDA 13.\
+Both images and the CI sync `--extra cpu`: the release image drops from 9.4 GB
+to 1.8 GB.\
+A `uv sync` without an extra removes torch; a plain `uv run` keeps it.
+
+To run the embeddings on the workstation GPU, sync a host venv:
+
+```sh
+cd apps/ml
+uv sync --frozen --extra gpu
+uv run --no-sync python -c "import torch; print(torch.cuda.is_available())"
+```
+
+It prints `True` with an NVIDIA driver that supports CUDA 13.
+
+pip-audit skips local versions such as `2.14.1+cpu`: the image's torch and
+torchvision are not audited.\
+Renovate's OSV alerts still cover them.
+
 ## Role
 
 Card recognition: given a photo of a card, find the closest cards in the

@@ -27,7 +27,8 @@ WORKDIR /app
 
 COPY apps/ml/pyproject.toml apps/ml/uv.lock ./
 RUN --mount=from=uv,source=/uv,target=/bin/uv \
-    uv sync --frozen --no-dev --no-build --no-cache
+    uv sync --frozen --no-dev --no-build --no-cache --extra cpu
+RUN /opt/venv/bin/python -c "import torch, torchvision"
 
 COPY apps/ml ./
 RUN chown -R ${USER_ID}:${GROUP_ID} /app
@@ -52,6 +53,6 @@ USER root
 
 COPY --from=uv /uv /uvx /bin/
 
-RUN uv sync --frozen --no-build
+RUN uv sync --frozen --no-build --extra cpu
 
 USER ${USER}

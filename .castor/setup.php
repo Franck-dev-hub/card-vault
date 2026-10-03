@@ -72,5 +72,5 @@ function ml(): void
         return;
     }
 
-    run(['uv', 'sync', '--frozen'], context: context()->withWorkingDirectory(\App::Ml->directory()));
+    run(['uv', 'sync', '--frozen', '--extra', 'cpu'], context: context()->withWorkingDirectory(\App::Ml->directory()));
 }

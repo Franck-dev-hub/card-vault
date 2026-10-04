@@ -9,10 +9,15 @@ permissions:
   packages: read
 
 jobs:
+  versions:
+    name: Versions
+    if: github.event.pull_request.draft == false
+    uses: ./.github/workflows/versions.yml
+
   backend:
     name: Backend
+    needs: versions
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     container:
       image: ghcr.io/franck-dev-hub/ci/php:latest
       credentials:
@@ -22,7 +27,7 @@ jobs:
       options: --user root
     services:
       database:
-        image: postgres:18-alpine
+        image: postgres:${{ fromJSON(needs.versions.outputs.env).POSTGRES_VERSION }}-alpine
         env:
           POSTGRES_DB: app
           POSTGRES_USER: app
@@ -36,7 +41,7 @@ jobs:
       APP_ENV: test
       APP_DEBUG: 1
       DEFAULT_URI: http://localhost
-      DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=18&charset=utf8
+      DATABASE_URL: postgresql://app:app@database:5432/app?serverVersion=${{ fromJSON(needs.versions.outputs.env).POSTGRES_VERSION }}&charset=utf8
       COMPOSER_ALLOW_SUPERUSER: 1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -65,19 +70,19 @@ jobs:
 
   frontend:
     name: Frontend
+    needs: versions
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     container:
-      image: node:26-slim
+      image: node:${{ fromJSON(needs.versions.outputs.env).NODEJS_VERSION }}-slim
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.8.1
+          version: v${{ fromJSON(needs.versions.outputs.env).CASTOR_VERSION }}
 
       - name: Install pnpm
-        run: npm install -g pnpm@12
+        run: npm install -g pnpm@${{ fromJSON(needs.versions.outputs.env).PNPM_VERSION }}
 
       - name: Install
         run: castor setup:frontend
@@ -93,26 +98,23 @@ jobs:
 
   ml:
     name: Machine learning
+    needs: versions
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     env:
       UV_NO_SYNC: 1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Read the Python version
-        run: grep '^PYTHON_VERSION=' .env >> "$GITHUB_ENV"
-
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          version: "0.12.21"
-          python-version: ${{ env.PYTHON_VERSION }}
+          version: ${{ fromJSON(needs.versions.outputs.env).UV_VERSION }}
+          python-version: ${{ fromJSON(needs.versions.outputs.env).PYTHON_VERSION }}
           # Leaves the 10 GB repo cache to the image builds.
           enable-cache: false
 
       - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.8.1
+          version: v${{ fromJSON(needs.versions.outputs.env).CASTOR_VERSION }}
 
       - name: Install
         run: castor setup:ml
@@ -128,8 +130,8 @@ jobs:
 
   docker:
     name: Docker build (${{ matrix.name }})
+    needs: versions
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
@@ -153,6 +155,7 @@ jobs:
           context: .
           file: ${{ matrix.file }}
           target: ${{ matrix.target }}
+          build-args: ${{ needs.versions.outputs.build-args }}
           push: false
           # Scoped per image, or both entries overwrite the same cache.
           cache-from: type=gha,scope=${{ matrix.name }}
@@ -160,8 +163,9 @@ jobs:
 
   e2e:
     name: E2E (Playwright)
+    needs: versions
     runs-on: ubuntu-latest
-    if: github.base_ref == 'prod' && github.event.pull_request.draft == false
+    if: github.base_ref == 'prod'
     env:
       # E2E needs the whole Docker stack.
       CASTOR_RUNTIME: host
@@ -170,7 +174,7 @@ jobs:
 
       - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.8.1
+          version: v${{ fromJSON(needs.versions.outputs.env).CASTOR_VERSION }}
 
       - name: Prepare environment
         run: castor setup:env

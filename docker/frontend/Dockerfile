@@ -1,11 +1,14 @@
-ARG NODEJS_VERSION=26
+# check=skip=InvalidDefaultArgInFrom
+ARG NODEJS_VERSION
+ARG PNPM_VERSION
 
 # ---------------------------------------------------------------------------
 # Build stage: compile the Angular app
 # ---------------------------------------------------------------------------
 FROM node:${NODEJS_VERSION}-alpine AS build
 
-RUN npm install -g pnpm@12
+ARG PNPM_VERSION
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 WORKDIR /app
 

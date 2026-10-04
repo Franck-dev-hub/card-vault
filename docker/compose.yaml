@@ -29,6 +29,7 @@ services:
         PHP_VERSION: ${PHP_VERSION:?error}
         FRANKENPHP_VERSION: ${FRANKENPHP_VERSION:?error}
         COMPOSER_VERSION: ${COMPOSER_VERSION:?error}
+        PHP_EXTENSION_INSTALLER_VERSION: ${PHP_EXTENSION_INSTALLER_VERSION:?error}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS:?error}
         SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
         USER: ${PROJECT_NAME:?error}
@@ -62,6 +63,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         NODEJS_VERSION: ${NODEJS_VERSION:?error}
+        PNPM_VERSION: ${PNPM_VERSION:?error}
     restart: unless-stopped
     depends_on:
       api:
@@ -75,6 +77,9 @@ services:
       target: ml_release
       args:
         PYTHON_VERSION: ${PYTHON_VERSION:?error}
+        PYTHON_DIGEST: ${PYTHON_DIGEST:?error}
+        UV_VERSION: ${UV_VERSION:?error}
+        UV_DIGEST: ${UV_DIGEST:?error}
         USER: ${PROJECT_NAME:?error}
         USER_ID: ${PROJECT_USER_ID:?error}
         GROUP_ID: ${PROJECT_GROUP_ID:?error}

@@ -18,8 +18,8 @@ final class UpstreamAwareHttpClientTest extends TestCase
 {
     private function clientReturning(ResponseInterface $response): ClientInterface
     {
-        return new class($response) implements ClientInterface {
-            public function __construct(private readonly ResponseInterface $response)
+        return new readonly class($response) implements ClientInterface {
+            public function __construct(private ResponseInterface $response)
             {
             }
 
@@ -32,8 +32,8 @@ final class UpstreamAwareHttpClientTest extends TestCase
 
     private function clientThrowing(\Throwable $error): ClientInterface
     {
-        return new class($error) implements ClientInterface {
-            public function __construct(private readonly \Throwable $error)
+        return new readonly class($error) implements ClientInterface {
+            public function __construct(private \Throwable $error)
             {
             }
 

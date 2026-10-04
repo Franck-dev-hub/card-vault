@@ -1,9 +1,12 @@
-ARG PHP_VERSION=8.5
-ARG FRANKENPHP_VERSION=1.12.7
-ARG COMPOSER_VERSION=2.10
-ARG NODEJS_VERSION=26
-ARG PHP_EXTENSION_INSTALLER_VERSION=2
-ARG CASTOR_VERSION=1.8.1
+# check=skip=InvalidDefaultArgInFrom
+# Versions come from .env only: a missing one fails the build.
+ARG PHP_VERSION
+ARG FRANKENPHP_VERSION
+ARG COMPOSER_VERSION
+ARG NODEJS_VERSION
+ARG PHP_EXTENSION_INSTALLER_VERSION
+ARG CASTOR_VERSION
+ARG PNPM_VERSION
 ARG PHP_EXTENSIONS="intl opcache apcu pdo_pgsql redis sodium"
 ARG USER=cardvault
 ARG USER_ID=1000
@@ -77,6 +80,7 @@ RUN sed -i "s/__SESSION_LIFETIME__/${SESSION_LIFETIME}/" "$PHP_INI_DIR/conf.d/de
 # ---------------------------------------------------------------------------
 FROM frankenphp_base AS frankenphp_dev
 
+ARG PNPM_VERSION
 ARG USER
 ARG USER_ID
 ARG GROUP_ID
@@ -97,8 +101,8 @@ EOF
 
 COPY --link docker/php/pcov.ini $PHP_INI_DIR/conf.d/pcov.ini
 
-# Node 25+ ships no corepack; pnpm switches itself to the packageManager version.
-RUN rm -rf /usr/local/bin/yarn /usr/local/bin/yarnpkg && npm install -g pnpm@12
+# Node 25+ ships no corepack.
+RUN rm -rf /usr/local/bin/yarn /usr/local/bin/yarnpkg && npm install -g pnpm@${PNPM_VERSION}
 
 RUN mkdir -p /home/${USER}/.composer && chown ${USER_ID}:${GROUP_ID} /home/${USER}/.composer
 

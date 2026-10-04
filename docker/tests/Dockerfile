@@ -1,12 +1,11 @@
-ARG NODEJS_VERSION=26
-ARG PLAYWRIGHT_VERSION=1.63.0
+ARG PLAYWRIGHT_VERSION
 
 # ---------------------------------------------------------------------------
 # Playwright E2E runner (CI): Angular app tests
 # ---------------------------------------------------------------------------
 FROM mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble AS playwright
 
-ARG NODEJS_VERSION
+ARG PNPM_VERSION
 ARG USER
 ARG USER_ID
 ARG GROUP_ID
@@ -26,7 +25,7 @@ RUN <<-EOF
     usermod -g "${USER}" "${USER}"
 EOF
 
-RUN npm install -g pnpm@12
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 USER ${USER}
 

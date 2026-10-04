@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[AutoconfigureTag('app.game_client', ['slug' => 'magic'])]
 final readonly class MagicClient implements GameClientInterface
 {
-    private const SLUG = 'magic';
+    private const string SLUG = 'magic';
 
     public function __construct(
         private HttpClientInterface $scryfallClient,

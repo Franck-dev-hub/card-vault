@@ -20,6 +20,8 @@ services:
         PHP_VERSION: ${PHP_VERSION:?error}
         FRANKENPHP_VERSION: ${FRANKENPHP_VERSION:?error}
         COMPOSER_VERSION: ${COMPOSER_VERSION:?error}
+        PHP_EXTENSION_INSTALLER_VERSION: ${PHP_EXTENSION_INSTALLER_VERSION:?error}
+        PNPM_VERSION: ${PNPM_VERSION:?error}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS:?error}
         SESSION_LIFETIME: ${SESSION_LIFETIME:?error}
         USER: ${PROJECT_NAME:?error}
@@ -52,7 +54,7 @@ services:
     build: !reset
     working_dir: /app
     user: "${PROJECT_USER_ID:?error}:${PROJECT_GROUP_ID:?error}"
-    command: ["sh", "-c", "npm install -g --prefix /tmp/pnpm pnpm@12 && pnpm install && pnpm exec ng serve --host 0.0.0.0"]
+    command: ["sh", "-c", "npm install -g --prefix /tmp/pnpm pnpm@${PNPM_VERSION:?error} && pnpm install && pnpm exec ng serve --host 0.0.0.0"]
     environment:
       # The container user cannot write /usr/local, so pnpm lives in /tmp.
       PATH: /tmp/pnpm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

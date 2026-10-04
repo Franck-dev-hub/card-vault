@@ -1,0 +1,40 @@
+name: Versions
+
+# .env holds every version.
+on:
+  workflow_call:
+    outputs:
+      env:
+        description: The versions and build values of .env, as a JSON object
+        value: ${{ jobs.read.outputs.env }}
+      build-args:
+        description: The versions of .env, one NAME=value per line
+        value: ${{ jobs.read.outputs.build-args }}
+
+permissions:
+  contents: read
+
+jobs:
+  read:
+    name: Read .env
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.read.outputs.env }}
+      build-args: ${{ steps.read.outputs.build-args }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .env
+          sparse-checkout-cone-mode: false
+
+      - name: Read .env
+        id: read
+        run: |
+          # An allowlist, never a source: .env is not a shell script.
+          values=$(grep -E '^([A-Z_]+_(VERSION|DIGEST)|PHP_EXTENSIONS|SESSION_LIFETIME|PROJECT_(NAME|USER_ID|GROUP_ID)|DOCKER_REGISTRY)=' .env | sed -E 's/="(.*)"$/=\1/')
+          echo "env=$(jq -Rnc '[inputs | capture("^(?<k>[A-Z_]+)=(?<v>.*)$") | {(.k): .v}] | add' <<< "$values")" >> "$GITHUB_OUTPUT"
+          {
+            echo 'build-args<<EOF'
+            grep -E '^[A-Z_]+_(VERSION|DIGEST)=' <<< "$values"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"

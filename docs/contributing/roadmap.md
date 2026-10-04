@@ -17,7 +17,7 @@ tickets.
 |-----------|------------------------------------------------------------|---------|
 | V0.1      | Backend foundation: Doctrine, migrations, API Platform     | done    |
 | V0.2      | Catalogue read path, split Redis, non-blocking ML          | done    |
-| V0.2.1    | ML closed to the public, ML tooling, rename to Game        | preprod |
+| V0.2.1    | ML closed to the public, ML tooling, rename to Game        | done    |
 | V0.2.2    | Versions in `.env`, Renovate scan, actions pinned by SHA   | preprod |
 | V0.2.3    | One image per tag, CI guards: Hadolint, Trivy, Doctrine    | preprod |
 | V0.2.4    | Continuous preprod: front proxy, secrets, auto deploy      | preprod |

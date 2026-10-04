@@ -11,7 +11,11 @@ services:
         org.opencontainers.image.source: https://github.com/Franck-dev-hub/card-vault
       args:
         PHP_VERSION: ${PHP_VERSION:?error}
+        FRANKENPHP_VERSION: ${FRANKENPHP_VERSION:?error}
         COMPOSER_VERSION: ${COMPOSER_VERSION:?error}
+        NODEJS_VERSION: ${NODEJS_VERSION:?error}
+        PHP_EXTENSION_INSTALLER_VERSION: ${PHP_EXTENSION_INSTALLER_VERSION:?error}
+        CASTOR_VERSION: ${CASTOR_VERSION:?error}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS:?error}
         USER: ${PROJECT_NAME:?error}
         USER_ID: ${PROJECT_USER_ID:?error}
@@ -46,6 +50,7 @@ services:
       dockerfile: docker/tests/Dockerfile
       args:
         PLAYWRIGHT_VERSION: ${PLAYWRIGHT_VERSION:?error}
+        PNPM_VERSION: ${PNPM_VERSION:?error}
         USER: ${PROJECT_NAME:?error}
         USER_ID: ${PROJECT_USER_ID:?error}
         GROUP_ID: ${PROJECT_GROUP_ID:?error}

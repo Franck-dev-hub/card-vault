@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ci;
 
 use Castor\Attribute\AsTask;
+use Symfony\Component\Dotenv\Dotenv;
 
 use function Castor\capture;
 use function Castor\io;
@@ -56,19 +57,34 @@ function docker(): void
 
     // The CI checkout has no gitignored files; a local context can hide a broken build.
     $tree = trim(capture(['git', 'stash', 'create'])) ?: 'HEAD';
+    $buildArgs = build_args();
 
     foreach (IMAGES as $name => [$file, $target]) {
         io()->section('Docker build (' . $name . ')');
         run(\sprintf(
-            'git archive %s | docker build -f %s%s -t card-vault/%s:local -',
+            'git archive %s | docker build -f %s%s%s -t card-vault/%s:local -',
             $tree,
             $file,
+            $buildArgs,
             null === $target ? '' : ' --target ' . $target,
             $name,
         ));
     }
 
     io()->success('Docker images built.');
+}
+
+function build_args(): string
+{
+    $env = (new Dotenv())->parse((string) file_get_contents(\dirname(__DIR__) . '/.env'));
+    $args = '';
+    foreach ($env as $name => $value) {
+        if (1 === preg_match('/_(VERSION|DIGEST)$/', $name)) {
+            $args .= ' --build-arg ' . escapeshellarg($name . '=' . $value);
+        }
+    }
+
+    return $args;
 }
 
 #[AsTask(name: 'all', description: 'Run every CI check (no E2E), Docker builds included', aliases: ['ci'])]

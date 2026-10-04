@@ -16,13 +16,19 @@ permissions:
   packages: write
 
 env:
-  REGISTRY: ${{ vars.DOCKER_REGISTRY || 'ghcr.io/franck-dev-hub' }}
   ENV: ${{ github.ref == 'refs/heads/preprod' && 'preprod' || 'prod' }}
 
 jobs:
+  versions:
+    name: Versions
+    uses: ./.github/workflows/versions.yml
+
   build-and-push:
     name: Build and push ${{ matrix.name }}
+    needs: versions
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: ${{ fromJSON(needs.versions.outputs.env).DOCKER_REGISTRY }}
     strategy:
       fail-fast: false
       matrix:
@@ -31,29 +37,24 @@ jobs:
             file: docker/Dockerfile
             target: frankenphp_release
             args: |
-              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '26' }}
-              PHP_VERSION=${{ vars.PHP_VERSION || '8.5' }}
-              FRANKENPHP_VERSION=${{ vars.FRANKENPHP_VERSION || '1.12.7' }}
-              COMPOSER_VERSION=${{ vars.COMPOSER_VERSION || '2.10' }}
-              PHP_EXTENSIONS=${{ vars.PHP_EXTENSIONS || 'intl opcache apcu pdo_pgsql redis sodium' }}
-              SESSION_LIFETIME=${{ vars.SESSION_LIFETIME || '604800' }}
-              USER=${{ vars.PROJECT_NAME || 'cardvault' }}
-              USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}
-              GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}
+              PHP_EXTENSIONS=${{ fromJSON(needs.versions.outputs.env).PHP_EXTENSIONS }}
+              SESSION_LIFETIME=${{ fromJSON(needs.versions.outputs.env).SESSION_LIFETIME }}
+              USER=${{ fromJSON(needs.versions.outputs.env).PROJECT_NAME }}
+              USER_ID=${{ fromJSON(needs.versions.outputs.env).PROJECT_USER_ID }}
+              GROUP_ID=${{ fromJSON(needs.versions.outputs.env).PROJECT_GROUP_ID }}
               RELEASE_APP_CONFIG_ENV=prod
               RELEASE_VERSION=${{ github.ref_name }}
           - name: frontend
             file: docker/frontend/Dockerfile
             target: ""
-            args: |
-              NODEJS_VERSION=${{ vars.NODEJS_VERSION || '26' }}
+            args: ""
           - name: ml
             file: docker/ml/Dockerfile
             target: ml_release
             args: |
-              USER=${{ vars.PROJECT_NAME || 'cardvault' }}
-              USER_ID=${{ vars.PROJECT_USER_ID || '1000' }}
-              GROUP_ID=${{ vars.PROJECT_GROUP_ID || '1000' }}
+              USER=${{ fromJSON(needs.versions.outputs.env).PROJECT_NAME }}
+              USER_ID=${{ fromJSON(needs.versions.outputs.env).PROJECT_USER_ID }}
+              GROUP_ID=${{ fromJSON(needs.versions.outputs.env).PROJECT_GROUP_ID }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -82,7 +83,9 @@ jobs:
           context: .
           file: ${{ matrix.file }}
           target: ${{ matrix.target }}
-          build-args: ${{ matrix.args }}
+          build-args: |
+            ${{ needs.versions.outputs.build-args }}
+            ${{ matrix.args }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}

@@ -1,14 +1,18 @@
-ARG PYTHON_VERSION=3.14
+# check=skip=InvalidDefaultArgInFrom
+ARG PYTHON_VERSION
+ARG PYTHON_DIGEST
 ARG USER=cardvault
 ARG USER_ID=1000
 ARG GROUP_ID=1000
+ARG UV_VERSION
+ARG UV_DIGEST
 
-FROM ghcr.io/astral-sh/uv:0.12.21@sha256:a7aed3216253ee804de3e2d8afa5073baa1a177335345d43845cd4165e43b711 AS uv
+FROM ghcr.io/astral-sh/uv:${UV_VERSION}@${UV_DIGEST} AS uv
 
 # ---------------------------------------------------------------------------
 # ML service: FastAPI + PyTorch + FAISS + Hugging Face
 # ---------------------------------------------------------------------------
-FROM python:${PYTHON_VERSION}-slim@sha256:0741d101873c12ab927e6f8653feb8862b9bd58771177acb1b885b95141f91b4 AS ml_release
+FROM python:${PYTHON_VERSION}-slim@${PYTHON_DIGEST} AS ml_release
 
 ARG USER
 ARG USER_ID

@@ -11,6 +11,7 @@ on:
       - docker/compose.ci.yaml
       - docker/php/**
       - .github/workflows/ci-images.yml
+      - .github/workflows/versions.yml
   workflow_dispatch:
 
 permissions:
@@ -18,15 +19,20 @@ permissions:
   packages: write
 
 jobs:
+  versions:
+    name: Versions
+    uses: ./.github/workflows/versions.yml
+
   php:
     name: Build and push ci/php
+    needs: versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: castor-php/setup-castor@2a495b8c91f00be6768ad8a040ba8634c797d386 # v1.1.0
         with:
-          version: v1.8.1
+          version: v${{ fromJSON(needs.versions.outputs.env).CASTOR_VERSION }}
 
       - name: Prepare environment
         run: castor setup:env

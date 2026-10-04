@@ -2,11 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "osvVulnerabilityAlerts": true,
-  "packageRules": [
+  "ignoreDeps": ["ghcr.io/franck-dev-hub/ci/php"],
+  "customManagers": [
     {
-      "description": "The image and the CI must lock with the same uv.",
-      "matchPackageNames": ["ghcr.io/astral-sh/uv", "astral-sh/uv"],
-      "groupName": "uv"
+      "customType": "regex",
+      "description": "Versions in .env, each under a # renovate: comment.",
+      "managerFilePatterns": ["/(^|/)\\.env$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))?\\n[A-Z_]+_VERSION=(?<currentValue>\\S+)(?:\\n[A-Z_]+_DIGEST=(?<currentDigest>sha256:[a-f0-9]{64}))?"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}"
     }
   ]
 }

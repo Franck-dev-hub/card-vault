@@ -20,7 +20,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         DoctrineSetList::DOCTRINE_CODE_QUALITY,
         SymfonySetList::SYMFONY_CODE_QUALITY,
-        LevelSetList::UP_TO_PHP_84,
+        LevelSetList::UP_TO_PHP_85,
         SetList::DEAD_CODE,
         SetList::CODE_QUALITY,
         SetList::EARLY_RETURN,

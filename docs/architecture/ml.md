@@ -32,7 +32,7 @@ It prints `True` with an NVIDIA driver that supports CUDA 13.
 
 pip-audit skips local versions such as `2.14.1+cpu`: the image's torch and
 torchvision are not audited.\
-Renovate's OSV alerts still cover them.
+Renovate's OSV alerts still cover them, on the Mend portal only.
 
 ## Role
 

@@ -74,6 +74,8 @@ function docker(): void
 #[AsTask(name: 'all', description: 'Run every CI check (no E2E), Docker builds included', aliases: ['ci'])]
 function all(): void
 {
+    // Fail on a version drift before the long checks and builds.
+    \lint\versions();
     frontend();
     ml();
     backend();

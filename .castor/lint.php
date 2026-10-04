@@ -93,40 +93,71 @@ function mypy(): void
     \exec_in(\App::Ml, ['uv', 'run', 'mypy', '.']);
 }
 
+#[AsTask(name: 'php-version', namespace: 'lint:backend', description: 'Check that every file declares the same PHP version')]
+function php_version(): void
+{
+    io()->section('PHP version');
+    $composer = \dirname(__DIR__) . '/apps/api/composer.json';
+    $versions = env_versions('PHP_VERSION') + [
+        'composer.json require.php' => read_version($composer, '/"php": ">=(\d+\.\d+)"/'),
+        'composer.json config.platform.php' => read_version($composer, '/"platform": \{\s*"php": "(\d+\.\d+)\.\d+"/'),
+    ];
+
+    assert_same_version('PHP', $versions);
+    io()->success(\sprintf('PHP %s everywhere.', $versions['.env']));
+}
+
 #[AsTask(name: 'python-version', namespace: 'lint:ml', description: 'Check that every file declares the same Python version')]
 function python_version(): void
 {
     io()->section('Python version');
-    $root = \dirname(__DIR__);
-    $versions = [
-        '.env' => read_version($root . '/.env', '/^PYTHON_VERSION=(\S+)$/m'),
-        'apps/ml/pyproject.toml' => read_version($root . '/apps/ml/pyproject.toml', '/^requires-python = "==(\d+\.\d+)\.\*"$/m'),
-        'docker/ml/Dockerfile' => read_version($root . '/docker/ml/Dockerfile', '/^ARG PYTHON_VERSION=(\S+)$/m'),
+    $pyproject = \dirname(__DIR__) . '/apps/ml/pyproject.toml';
+    $versions = env_versions('PYTHON_VERSION') + [
+        'apps/ml/pyproject.toml' => read_version($pyproject, '/^requires-python = "==(\d+\.\d+)\.\*"$/m'),
     ];
+
+    assert_same_version('Python', $versions);
+    io()->success(\sprintf('Python %s everywhere.', $versions['.env']));
+}
+
+#[AsTask(name: 'versions', description: 'Check that every file declares the runtime versions of .env')]
+function versions(): void
+{
+    php_version();
+    python_version();
+}
+
+/**
+ * @return array<string, string|null> env file => version
+ */
+function env_versions(string $variable): array
+{
+    $root = \dirname(__DIR__);
+    $pattern = '/^' . $variable . '=(\S+)$/m';
+    $versions = ['.env' => read_version($root . '/.env', $pattern)];
     // Compose loads .env.local over .env: a stale copy would pin the old version.
     $local = $root . '/.env.local';
-    if (is_file($local) && null !== $version = read_version($local, '/^PYTHON_VERSION=(\S+)$/m')) {
+    if (is_file($local) && null !== $version = read_version($local, $pattern)) {
         $versions['.env.local'] = $version;
     }
 
-    assert_same_version($versions);
-    io()->success(\sprintf('Python %s everywhere.', $versions['.env']));
+    return $versions;
 }
 
 /**
  * @param array<string, string|null> $versions file => version, null when the pattern is not found
  */
-function assert_same_version(array $versions): void
+function assert_same_version(string $runtime, array $versions): void
 {
     $unreadable = array_keys($versions, null, true);
     if ([] !== $unreadable) {
-        throw new \RuntimeException(\sprintf('No Python version found in: %s.', implode(', ', $unreadable)));
+        throw new \RuntimeException(\sprintf('No %s version found in: %s.', $runtime, implode(', ', $unreadable)));
     }
 
     if (1 !== \count(array_unique($versions))) {
         $found = array_map(static fn (string $file, string $version): string => "{$file} {$version}", array_keys($versions), $versions);
 
-        throw new \RuntimeException(\sprintf('Python versions differ: %s.', implode(', ', $found)));
+        throw new \RuntimeException(\sprintf('%s versions differ: %s.', $runtime, implode(', ', $found)));
     }
 }
 
@@ -140,6 +171,7 @@ function backend(
     #[AsOption(description: 'Apply the fixes')]
     bool $fix = false,
 ): void {
+    php_version();
     composer();
     rector($fix);
     cs_fixer($fix);

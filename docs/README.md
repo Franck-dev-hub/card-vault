@@ -24,6 +24,7 @@
 
 - [Contributing guidelines](../CONTRIBUTING.md)
 - [Roadmap](contributing/roadmap.md)
+- [Dependency updates](contributing/dependency-updates.md)
 
 ## User guide
 

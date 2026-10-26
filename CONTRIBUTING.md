@@ -50,6 +50,8 @@ Commit messages look like this:
 - If you added or changed an endpoint, module or component, update its
   architecture doc in the same pull request (see the
   [docs index](docs/README.md)).
+- If you updated a lock file, commit its
+  [diff report](docs/contributing/dependency-updates.md) with it.
 
 ## Issues and security
 

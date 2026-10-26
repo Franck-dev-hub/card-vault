@@ -19,3 +19,6 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+# Diff report base, see docs/contributing/dependency-updates.md
+/composer.lock.base

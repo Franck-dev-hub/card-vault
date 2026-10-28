@@ -1,112 +1,52 @@
-name: Deployment
+name: Promote to prod
 
+# The server pulls :prod itself (docker/deploy/pull-deploy.sh): no way in to the server lives here.
 on:
-  workflow_run:
-    workflows:
-      - "Build and Push to GHCR"
-    types:
-      - completed
   workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag to promote, e.g. v0.3
+        required: true
 
 permissions:
   contents: read
-  packages: read
-  deployments: write
+  packages: write
 
 jobs:
-  deployment:
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'prod' && github.event.workflow_run.event == 'push')
+  versions:
+    name: Versions
+    uses: ./.github/workflows/versions.yml
+
+  promote:
+    name: Promote ${{ inputs.version }}
+    needs: versions
     runs-on: ubuntu-latest
     environment: prod
     concurrency: prod
+    env:
+      REGISTRY: ${{ fromJSON(needs.versions.outputs.env).DOCKER_REGISTRY }}
+      VERSION: ${{ inputs.version }}
 
     steps:
-      - name: Create GitHub Deployment (Pending)
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        id: deployment
+      - name: Check the version
+        run: |
+          if [[ ! "$VERSION" =~ ^v[0-9]+(\.[0-9]+)+$ ]]; then
+            echo "::error::${VERSION} is not a release tag"
+            exit 1
+          fi
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
-          script: |
-            const ref = context.payload.workflow_run ? context.payload.workflow_run.head_sha : context.sha;
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: ref,
-              environment: 'production',
-              auto_merge: false,
-              required_contexts: [],
-              description: `Deploying from ${ref}`,
-              transient_environment: false
-            });
-            core.setOutput('deployment_id', deployment.data.id);
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Connect to Tailscale
-        uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4.2.0
-        with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-
-      - name: Deploy via SSH (Pull from GHCR)
-        id: deploy-ssh
-        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
-            cd ~/Server/card-vault
-            git remote set-url origin https://github.com/${{ github.repository }}.git
-            git pull origin prod
-
-            # Log in to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            # Fail fast if prod secrets are still placeholders
-            if [ ! -f .env.prod.local ]; then
-              echo "ERROR: .env.prod.local is missing. Create it on the host with APP_SECRET, POSTGRES_PASSWORD and PGADMIN_PASSWORD."
-              exit 1
-            fi
-            for key in APP_SECRET POSTGRES_PASSWORD; do
-              if grep -q "^${key}=change-me$" .env.prod.local; then
-                echo "ERROR: ${key} is still a placeholder in .env.prod.local."
-                exit 1
-              fi
-            done
-
-            # Pull and start the production stack (migrations run on boot via the migrate service)
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local pull
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local up -d
-
-            # Verify services are running
-            docker compose -f docker/compose.yaml -f docker/compose.prod.yaml --env-file .env --env-file .env.prod --env-file .env.prod.local ps
-
-            # Clean up dangling images only, never other projects' containers
-            docker image prune -f
-
-      - name: Update Deployment Status (Success)
-        if: success() && steps.deploy-ssh.outcome == 'success'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.deployment.outputs.deployment_id }},
-              state: 'success',
-              environment: 'production',
-              environment_url: 'https://card-vault.fr',
-              description: 'Successfully deployed from GHCR'
-            });
-
-      - name: Update Deployment Status (Failure)
-        if: failure() || steps.deploy-ssh.outcome == 'failure'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.deployment.outputs.deployment_id }},
-              state: 'failure',
-              environment: 'production',
-              description: 'Deployment failed. Check logs.'
-            });
+      - name: Tag the release as prod
+        run: |
+          for service in api frontend ml; do
+            # Copies the manifest as is: by default buildx wraps it in a new index with another digest.
+            docker buildx imagetools create --prefer-index=false \
+              --tag "${REGISTRY}/${service}/prod:prod" \
+              "${REGISTRY}/${service}/prod:${VERSION}"
+          done

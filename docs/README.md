@@ -10,6 +10,7 @@
 - [Installation](getting-started/installation.md)
 - [Configuration](getting-started/configuration.md)
 - [Troubleshooting](getting-started/troubleshooting.md)
+- [Deployment](getting-started/deployment.md)
 
 ## Architecture
 
